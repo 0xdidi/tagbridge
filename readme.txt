@@ -4,7 +4,7 @@ Tags: analytics, posthog, tracking, events, statistics
 Requires at least: 5.8
 Tested up to: 7.0
 Requires PHP: 8.2
-Stable tag: 0.2.1
+Stable tag: 0.2.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -96,6 +96,9 @@ You are responsible for telling your visitors what you collect and for obtaining
 
 == Changelog ==
 
+= 0.2.2 =
+* Added the Tagbridge brand mark to the settings screen header. No functional changes.
+
 = 0.2.1 =
 * Redesigned the settings screen: a clearer page header, each section's status or master switch in its header, a two-column layout for tracking and identity, and refined controls. No functional changes.
 
@@ -108,6 +111,9 @@ You are responsible for telling your visitors what you collect and for obtaining
 * First release: connect to PostHog (US, EU, or self-hosted / reverse proxy), validate the key before saving, and load PostHog on the front end with tracking toggles (pageviews, autocapture, session recording, person profiles, cookieless mode).
 
 == Upgrade Notice ==
+
+= 0.2.2 =
+Adds the Tagbridge brand mark to the settings header. No functional changes.
 
 = 0.2.1 =
 A redesigned settings screen. No functional changes.
