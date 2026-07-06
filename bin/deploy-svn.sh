@@ -38,6 +38,11 @@ cp -R "$PLUGIN_DIR/src" "${SVN_DIR}/trunk/src"
 cp -R "$PLUGIN_DIR/assets" "${SVN_DIR}/trunk/assets"
 cp -R "$PLUGIN_DIR/languages" "${SVN_DIR}/trunk/languages"
 
+# Brand source art and the design preview live in assets/img for the repo only.
+# The admin UI renders its mark as inline SVG, so nothing here is used at
+# runtime; keep it out of the shipped package (matches bin/build-zip.sh).
+rm -rf "${SVN_DIR}/trunk/assets/img"
+
 # Production vendor (from temp build)
 cp -R "$TEMP_VENDOR/vendor" "${SVN_DIR}/trunk/vendor"
 rm -rf "$TEMP_VENDOR"
