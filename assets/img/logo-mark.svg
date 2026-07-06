@@ -1,0 +1,8 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Tagbridge">
+  <title>Tagbridge</title>
+  <!-- Arch bridge: the span that connects two systems -->
+  <path d="M18 42 C 18 16, 46 16, 46 42" stroke="#f7a501" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <!-- Two anchor nodes (the endpoints being bridged) -->
+  <circle cx="18" cy="42" r="6" fill="#23251d"/>
+  <circle cx="46" cy="42" r="6" fill="#23251d"/>
+</svg>

@@ -1,0 +1,13 @@
+<svg width="300" height="72" viewBox="0 0 300 72" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Tagbridge">
+  <title>Tagbridge</title>
+  <!-- Mark -->
+  <g transform="translate(4 4)">
+    <path d="M18 42 C 18 16, 46 16, 46 42" stroke="#f7a501" stroke-width="6" stroke-linecap="round" fill="none"/>
+    <circle cx="18" cy="42" r="6" fill="#23251d"/>
+    <circle cx="46" cy="42" r="6" fill="#23251d"/>
+  </g>
+  <!-- Wordmark (Sora when available, rounded-geometric fallback otherwise) -->
+  <text x="76" y="46"
+        font-family="'Tagbridge Sora', ui-rounded, 'SF Pro Rounded', Quicksand, Nunito, 'Segoe UI', system-ui, sans-serif"
+        font-size="34" font-weight="700" letter-spacing="0.2" fill="#23251d">Tagbridge</text>
+</svg>

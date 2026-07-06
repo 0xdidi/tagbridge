@@ -1,0 +1,10 @@
+<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Tagbridge">
+  <title>Tagbridge</title>
+  <!-- Ink tile -->
+  <rect width="256" height="256" rx="56" fill="#23251d"/>
+  <!-- Accent arch bridge -->
+  <path d="M76 168 C 76 68, 180 68, 180 168" stroke="#f7a501" stroke-width="24" stroke-linecap="round" fill="none"/>
+  <!-- Cream anchor nodes -->
+  <circle cx="76" cy="168" r="24" fill="#fbfaf6"/>
+  <circle cx="180" cy="168" r="24" fill="#fbfaf6"/>
+</svg>

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tagbridge logo preview</title>
+<style>
+  @font-face {
+    font-family: "Tagbridge Sora";
+    font-weight: 600 700;
+    font-display: swap;
+    src: url("../fonts/sora-latin.woff2") format("woff2");
+  }
+  :root{
+    --ink:#23251d; --ink-soft:#4d4f46; --canvas:#fff; --canvas-soft:#fbfaf6;
+    --border:#e6e3d8; --accent:#f7a501; --radius:10px;
+    --title:"Tagbridge Sora", ui-rounded, "SF Pro Rounded", Quicksand, Nunito, "Segoe UI", system-ui, sans-serif;
+  }
+  body{ margin:0; background:var(--canvas-soft); color:var(--ink-soft);
+        font:15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; padding:40px; }
+  h1{ font-family:var(--title); color:var(--ink); font-size:22px; }
+  h2{ font-family:var(--title); color:var(--ink); font-size:15px; margin:36px 0 12px; text-transform:uppercase; letter-spacing:.08em; }
+  .grid{ display:flex; flex-wrap:wrap; gap:24px; align-items:center; }
+  .tile{ background:var(--canvas); border:1px solid var(--border); border-radius:var(--radius);
+         padding:24px; display:flex; flex-direction:column; align-items:center; gap:10px; }
+  .tile small{ font-size:12px; color:#74766c; }
+  .on-ink{ background:var(--ink); }
+  .on-accent{ background:var(--accent); }
+  .swatch{ display:flex; gap:12px; flex-wrap:wrap; }
+  .swatch div{ width:120px; }
+  .chip{ height:56px; border-radius:8px; border:1px solid rgba(0,0,0,.08); }
+
+  /* Faithful copy of the real admin hero band */
+  .hero{ display:flex; align-items:center; justify-content:space-between; gap:16px;
+         padding:20px 24px; border-radius:var(--radius); background:var(--accent); color:var(--ink);
+         box-shadow:0 1px 2px rgba(35,37,29,.04); max-width:900px; }
+  .hero__brand{ display:flex; align-items:center; gap:14px; }
+  .hero__brand img{ width:44px; height:44px; }
+  .wordmark{ font-family:var(--title); font-weight:700; font-size:28px; line-height:1.05; color:var(--ink); }
+  .subtitle{ margin-top:3px; font-size:13px; font-weight:500; color:rgba(35,37,29,.74); }
+
+  /* Plugins-list icon mockup */
+  .plugin-row{ display:flex; gap:16px; align-items:flex-start; background:var(--canvas);
+               border:1px solid var(--border); border-radius:var(--radius); padding:16px; max-width:560px; }
+  .plugin-row img{ width:64px; height:64px; border-radius:12px; }
+</style>
+</head>
+<body>
+  <h1>Tagbridge — logo &amp; header proposal</h1>
+  <p>Mark concept: an arch bridge linking two anchor nodes — the two systems Tagbridge connects. Single accent (<code>#f7a501</code>) over ink (<code>#23251d</code>).</p>
+
+  <h2>The mark</h2>
+  <div class="grid">
+    <div class="tile"><img src="logo-mark.svg" width="96" height="96" alt=""><small>on light</small></div>
+    <div class="tile on-ink"><img src="icon.svg" width="96" height="96" alt=""><small style="color:#bbb">icon tile</small></div>
+    <div class="tile on-accent"><img src="logo-mark-ink.svg" width="96" height="96" alt=""><small>ink on accent</small></div>
+  </div>
+
+  <h2>Header lockup</h2>
+  <div class="grid">
+    <div class="tile"><img src="logo-header.svg" width="300" height="72" alt=""></div>
+  </div>
+
+  <h2>In the admin hero (live CSS)</h2>
+  <div class="hero">
+    <div class="hero__brand">
+      <img src="logo-mark-ink.svg" alt="">
+      <span>
+        <div class="wordmark">Tagbridge</div>
+        <div class="subtitle">Connect WordPress to the tools you already use.</div>
+      </span>
+    </div>
+  </div>
+
+  <h2>Plugins-list icon</h2>
+  <div class="plugin-row">
+    <img src="icon.svg" alt="">
+    <div>
+      <div class="wordmark" style="font-size:18px">Tagbridge – Deep Integration for PostHog</div>
+      <p style="margin:6px 0 0">Connect your PostHog project, configure what gets tracked, and load PostHog on your site — no code.</p>
+    </div>
+  </div>
+
+  <h2>WordPress.org banner</h2>
+  <img src="banner.svg" alt="" style="width:100%; max-width:900px; border:1px solid var(--border); border-radius:var(--radius)">
+
+  <h2>Palette</h2>
+  <div class="swatch">
+    <div><div class="chip" style="background:#23251d"></div><small>ink #23251d</small></div>
+    <div><div class="chip" style="background:#f7a501"></div><small>accent #f7a501</small></div>
+    <div><div class="chip" style="background:#f54e00"></div><small>brand red #f54e00</small></div>
+    <div><div class="chip" style="background:#fbfaf6"></div><small>cream #fbfaf6</small></div>
+  </div>
+</body>
+</html>

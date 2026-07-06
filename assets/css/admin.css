@@ -80,6 +80,18 @@
 	min-width: 0;
 }
 
+/* Brand mark, rendered inline as SVG. Uses currentColor so it reads as ink on
+   the accent hero band. */
+.tagbridge-hero__mark {
+	display: inline-flex;
+	flex: 0 0 auto;
+	color: var(--hp-ink);
+}
+
+.tagbridge-hero__mark svg {
+	display: block;
+}
+
 .tagbridge-hero__titles {
 	display: flex;
 	flex-direction: column;

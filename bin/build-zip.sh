@@ -27,6 +27,11 @@ cp -R "${ROOT}/src"        "${DEST}/"
 cp -R "${ROOT}/assets"     "${DEST}/"
 cp -R "${ROOT}/languages"  "${DEST}/"
 
+# Brand source art and the design preview live in assets/img for the repo only.
+# The admin UI renders its mark as inline SVG, so nothing here is used at
+# runtime; keep it out of the shipped package.
+rm -rf "${DEST}/assets/img"
+
 # Vendored runtime dependencies (no dev tooling).
 # composer.json and composer.lock ship with the plugin so reviewers and users
 # can see and reproduce the dependency tree (WordPress.org asks for this).

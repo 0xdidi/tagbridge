@@ -7,6 +7,12 @@ Tagbridge is not affiliated with, endorsed by, or sponsored by PostHog.
 
 This is the developer README. End-user documentation lives in `readme.txt`.
 
+> **Note on the name:** This project was previously called **HogPress**. It was
+> renamed to **Tagbridge** to avoid any potential WordPress or PostHog trademark
+> issues. The old `hogpress` repository is kept as an archive; all further
+> development happens here. The plugin is published on WordPress.org at
+> https://wordpress.org/plugins/tagbridge/.
+
 ## Architecture
 
 Two layers with a hard line between them:

@@ -1,0 +1,7 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Tagbridge">
+  <title>Tagbridge</title>
+  <!-- Monochrome ink version, for placement on the accent (yellow) hero band -->
+  <path d="M18 42 C 18 16, 46 16, 46 42" stroke="#23251d" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <circle cx="18" cy="42" r="6" fill="#23251d"/>
+  <circle cx="46" cy="42" r="6" fill="#23251d"/>
+</svg>

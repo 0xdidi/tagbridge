@@ -260,6 +260,13 @@ final class SettingsPage {
 		<div class="wrap tagbridge-wrap">
 			<header class="tagbridge-hero">
 				<div class="tagbridge-hero__brand">
+					<span class="tagbridge-hero__mark" aria-hidden="true">
+						<svg width="40" height="40" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" focusable="false">
+							<path d="M18 42 C 18 16, 46 16, 46 42" stroke="currentColor" stroke-width="6" stroke-linecap="round" fill="none"/>
+							<circle cx="18" cy="42" r="6" fill="currentColor"/>
+							<circle cx="46" cy="42" r="6" fill="currentColor"/>
+						</svg>
+					</span>
 					<span class="tagbridge-hero__titles">
 						<span class="tagbridge-wordmark">Tagbridge</span>
 						<span class="tagbridge-hero__subtitle"><?php esc_html_e( 'Connect WordPress to the tools you already use.', 'tagbridge' ); ?></span>

@@ -1,0 +1,23 @@
+<svg width="1544" height="500" viewBox="0 0 1544 500" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Tagbridge — Connect WordPress to the tools you already use">
+  <title>Tagbridge</title>
+  <!-- Cream canvas -->
+  <rect width="1544" height="500" fill="#fbfaf6"/>
+  <!-- Oversized bridge motif, faint, bleeding off the right edge -->
+  <g opacity="0.10">
+    <path d="M1120 470 C 1120 90, 1620 90, 1620 470" stroke="#f7a501" stroke-width="70" stroke-linecap="round" fill="none"/>
+    <circle cx="1120" cy="470" r="70" fill="#23251d"/>
+    <circle cx="1620" cy="470" r="70" fill="#23251d"/>
+  </g>
+  <!-- Lockup -->
+  <g transform="translate(150 138) scale(3)">
+    <path d="M18 42 C 18 16, 46 16, 46 42" stroke="#f7a501" stroke-width="6" stroke-linecap="round" fill="none"/>
+    <circle cx="18" cy="42" r="6" fill="#23251d"/>
+    <circle cx="46" cy="42" r="6" fill="#23251d"/>
+  </g>
+  <text x="360" y="270"
+        font-family="'Tagbridge Sora', ui-rounded, 'SF Pro Rounded', Quicksand, Nunito, 'Segoe UI', system-ui, sans-serif"
+        font-size="96" font-weight="700" letter-spacing="0.5" fill="#23251d">Tagbridge</text>
+  <text x="362" y="330"
+        font-family="ui-rounded, 'SF Pro Rounded', Quicksand, Nunito, 'Segoe UI', system-ui, sans-serif"
+        font-size="34" font-weight="500" fill="#4d4f46">Connect WordPress to the tools you already use.</text>
+</svg>
