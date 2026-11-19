@@ -2,10 +2,6 @@
 /**
  * Server-side event dispatcher.
  *
- * Owns the Core ServerClient lifecycle: it lazily initializes posthog-php on the
- * first event, flushes on shutdown, gates each event on its setting, and logs
- * (only when WP_DEBUG) without ever letting a failure reach the visitor.
- *
  * @package Tagbridge\Modules\PostHog
  */
 
@@ -56,7 +52,6 @@ final class Dispatcher {
 
 		$this->client = $client;
 
-		// Deliver queued events at the end of the request without blocking it.
 		add_action( 'shutdown', array( $this, 'flush' ), 100 );
 
 		return $this->client;

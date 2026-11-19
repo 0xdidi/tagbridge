@@ -7,10 +7,15 @@
 
 namespace Tagbridge\Platform;
 
+use Tagbridge\Core\Privacy\ConsentCategory;
 use Tagbridge\Modules\PostHog\Module as PostHogModule;
 use Tagbridge\Platform\Admin\Notices;
 use Tagbridge\Platform\Admin\SettingsPage;
+use Tagbridge\Platform\Events\EventBus;
+use Tagbridge\Platform\Events\Sources\WooCommerceSource;
+use Tagbridge\Platform\Events\Sources\WordPressSource;
 use Tagbridge\Platform\Modules\Registry;
+use Tagbridge\Platform\Privacy\PrivacyGate;
 
 /**
  * Wires the plugin together on init.
@@ -43,6 +48,13 @@ final class Plugin {
 	private $registry = null;
 
 	/**
+	 * Shared platform event bus.
+	 *
+	 * @var EventBus|null
+	 */
+	private $event_bus = null;
+
+	/**
 	 * Get the shared instance.
 	 *
 	 * @return Plugin
@@ -60,26 +72,35 @@ final class Plugin {
 	private function __construct() {}
 
 	/**
-	 * The integration module manifest: id => { class, default-enabled }.
+	 * The integration module manifest: id => metadata + class.
 	 *
-	 * This is the one place new integrations are registered. Only the class name
-	 * is referenced here, so the autoloader never touches a module's files until
-	 * the registry instantiates it (and it only does that when enabled).
+	 * Uses literal string keys and ::class references (which PHP resolves at
+	 * compile time without triggering the autoloader), so a disabled module's
+	 * files are never loaded on normal requests.
 	 *
-	 * @return array<string,array{class:string,default:bool}>
+	 * @return array<string,array<string,mixed>>
 	 */
 	private function manifest() {
 		$manifest = array(
-			PostHogModule::ID => array(
-				'class'   => PostHogModule::class,
-				'default' => true,
+			'posthog' => array(
+				'class'            => PostHogModule::class,
+				'default'          => true,
+				'label'            => static function () {
+					return __( 'PostHog', 'tagbridge' );
+				},
+				'description'      => static function () {
+					return __( 'Send pageviews, autocapture, identity, and server-side events to PostHog.', 'tagbridge' );
+				},
+				'category'         => 'analytics',
+				'consent_category' => ConsentCategory::STATISTICS,
+				'icon'             => 'assets/icons/posthog.svg',
 			),
 		);
 
 		/**
 		 * Filter the integration module manifest.
 		 *
-		 * @param array<string,array{class:string,default:bool}> $manifest Module manifest.
+		 * @param array<string,array<string,mixed>> $manifest Module manifest.
 		 */
 		return (array) apply_filters( 'tagbridge_module_manifest', $manifest );
 	}
@@ -97,6 +118,18 @@ final class Plugin {
 	}
 
 	/**
+	 * The shared event bus, built once per request.
+	 *
+	 * @return EventBus
+	 */
+	public function event_bus() {
+		if ( null === $this->event_bus ) {
+			$this->event_bus = new EventBus();
+		}
+		return $this->event_bus;
+	}
+
+	/**
 	 * Initialise the plugin. Runs on plugins_loaded.
 	 *
 	 * @return void
@@ -107,14 +140,20 @@ final class Plugin {
 		}
 		$this->booted = true;
 
+		PrivacyGate::register();
+
 		$registry = $this->registry();
 
-		// Admin UI (always available so modules can be configured and toggled).
 		( new SettingsPage( $registry ) )->register();
 		( new Notices( $registry ) )->register();
 
-		// Boot only the enabled integration modules.
-		$registry->boot_enabled();
+		$bus = $this->event_bus();
+		$registry->boot_enabled( $bus );
+
+		if ( $bus->has_subscribers() ) {
+			( new WordPressSource( $bus ) )->register();
+			( new WooCommerceSource( $bus ) )->register();
+		}
 	}
 
 	/**
@@ -123,7 +162,6 @@ final class Plugin {
 	 * @return void
 	 */
 	public static function activate() {
-		// Flush rewrite rules defensively in case future rewrites are added.
 		flush_rewrite_rules();
 	}
 

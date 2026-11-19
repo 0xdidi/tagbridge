@@ -2,18 +2,13 @@
 /**
  * PostHog settings panel.
  *
- * Renders the body of the PostHog module's settings: the tab nav and the
- * Connection, Tracking, Identity, and Server-side events panels. The admin shell
- * owns the page chrome, nonce, and save flow; this only outputs the module's
- * fields, namespaced under the module id so the shell can route the saved data.
- *
  * @package Tagbridge\Modules\PostHog
  */
 
 namespace Tagbridge\Modules\PostHog;
 
 use Tagbridge\Core\Connection\Host;
-use Tagbridge\Modules\PostHog\Listeners\WooEvents;
+use Tagbridge\Platform\Events\Sources\WooCommerceSource;
 
 /**
  * Renders the PostHog module's settings UI.
@@ -63,17 +58,18 @@ final class SettingsPanel {
 		$client      = Settings::client();
 		$identity    = Settings::identity();
 		$server      = Settings::server_events();
-		$woo_active  = WooEvents::woocommerce_active();
+		$woo_active  = WooCommerceSource::is_active();
 		$is_custom   = Host::REGION_CUSTOM === $region;
 		?>
 		<nav class="tagbridge-tabs" role="tablist" aria-label="<?php esc_attr_e( 'PostHog settings', 'tagbridge' ); ?>">
 			<?php
 			$first = true;
 			foreach ( $this->tabs() as $key => $label ) {
+				$scoped = $this->id . '-' . $key;
 				printf(
-					'<button type="button" class="tagbridge-tab%1$s" id="tagbridge-tab-%2$s" role="tab" aria-controls="tagbridge-panel-%2$s" aria-selected="%3$s" tabindex="%4$s" data-hp-tab="%2$s">%5$s</button>',
+					'<button type="button" class="tagbridge-tab%1$s" id="tagbridge-tab-%2$s" role="tab" aria-controls="tagbridge-panel-%2$s" aria-selected="%3$s" tabindex="%4$s" data-tagbridge-tab="%2$s">%5$s</button>',
 					$first ? ' is-active' : '',
-					esc_attr( $key ),
+					esc_attr( $scoped ),
 					$first ? 'true' : 'false',
 					$first ? '0' : '-1',
 					esc_html( $label )
@@ -83,7 +79,7 @@ final class SettingsPanel {
 			?>
 		</nav>
 
-		<div class="tagbridge-panel is-active" id="tagbridge-panel-connection" role="tabpanel" aria-labelledby="tagbridge-tab-connection" tabindex="0">
+		<div class="tagbridge-panel is-active" id="tagbridge-panel-<?php echo esc_attr( $this->id ); ?>-connection" role="tabpanel" aria-labelledby="tagbridge-tab-<?php echo esc_attr( $this->id ); ?>-connection" tabindex="0">
 			<section class="tagbridge-card">
 				<div class="tagbridge-card__head">
 					<h2 class="tagbridge-card__title"><?php esc_html_e( 'Connection', 'tagbridge' ); ?></h2>
@@ -99,10 +95,10 @@ final class SettingsPanel {
 					</p>
 
 					<div class="tagbridge-field">
-						<label class="tagbridge-label" for="tagbridge-key"><?php esc_html_e( 'Project API key', 'tagbridge' ); ?></label>
+						<label class="tagbridge-label" for="tagbridge-<?php echo esc_attr( $this->id ); ?>-key"><?php esc_html_e( 'Project API key', 'tagbridge' ); ?></label>
 						<input
 							type="text"
-							id="tagbridge-key"
+							id="tagbridge-<?php echo esc_attr( $this->id ); ?>-key"
 							class="tagbridge-input tagbridge-input--mono regular-text"
 							name="<?php echo esc_attr( $this->field( 'project_api_key' ) ); ?>"
 							value="<?php echo esc_attr( $api_key ); ?>"
@@ -116,8 +112,8 @@ final class SettingsPanel {
 					</div>
 
 					<div class="tagbridge-field">
-						<label class="tagbridge-label" for="tagbridge-region"><?php esc_html_e( 'Region', 'tagbridge' ); ?></label>
-						<select id="tagbridge-region" class="tagbridge-input" name="<?php echo esc_attr( $this->field( 'region' ) ); ?>" data-tagbridge-region>
+						<label class="tagbridge-label" for="tagbridge-<?php echo esc_attr( $this->id ); ?>-region"><?php esc_html_e( 'Region', 'tagbridge' ); ?></label>
+						<select id="tagbridge-<?php echo esc_attr( $this->id ); ?>-region" class="tagbridge-input" name="<?php echo esc_attr( $this->field( 'region' ) ); ?>" data-tagbridge-region>
 							<option value="<?php echo esc_attr( Host::REGION_US ); ?>" <?php selected( $region, Host::REGION_US ); ?>><?php esc_html_e( 'US cloud (us.i.posthog.com)', 'tagbridge' ); ?></option>
 							<option value="<?php echo esc_attr( Host::REGION_EU ); ?>" <?php selected( $region, Host::REGION_EU ); ?>><?php esc_html_e( 'EU cloud (eu.i.posthog.com)', 'tagbridge' ); ?></option>
 							<option value="<?php echo esc_attr( Host::REGION_CUSTOM ); ?>" <?php selected( $region, Host::REGION_CUSTOM ); ?>><?php esc_html_e( 'Self-hosted or reverse proxy', 'tagbridge' ); ?></option>
@@ -125,10 +121,10 @@ final class SettingsPanel {
 					</div>
 
 					<div class="tagbridge-field" data-tagbridge-custom-host <?php echo $is_custom ? '' : 'hidden'; ?>>
-						<label class="tagbridge-label" for="tagbridge-host"><?php esc_html_e( 'Custom host URL', 'tagbridge' ); ?></label>
+						<label class="tagbridge-label" for="tagbridge-<?php echo esc_attr( $this->id ); ?>-host"><?php esc_html_e( 'Custom host URL', 'tagbridge' ); ?></label>
 						<input
 							type="url"
-							id="tagbridge-host"
+							id="tagbridge-<?php echo esc_attr( $this->id ); ?>-host"
 							class="tagbridge-input tagbridge-input--mono regular-text"
 							name="<?php echo esc_attr( $this->field( 'custom_host' ) ); ?>"
 							value="<?php echo esc_attr( $custom_host ); ?>"
@@ -144,7 +140,7 @@ final class SettingsPanel {
 			</section>
 		</div>
 
-		<div class="tagbridge-panel" id="tagbridge-panel-tracking" role="tabpanel" aria-labelledby="tagbridge-tab-tracking" tabindex="0" hidden>
+		<div class="tagbridge-panel" id="tagbridge-panel-<?php echo esc_attr( $this->id ); ?>-tracking" role="tabpanel" aria-labelledby="tagbridge-tab-<?php echo esc_attr( $this->id ); ?>-tracking" tabindex="0" hidden>
 			<section class="tagbridge-card">
 				<div class="tagbridge-card__head">
 					<h2 class="tagbridge-card__title"><?php esc_html_e( 'Tracking', 'tagbridge' ); ?></h2>
@@ -197,7 +193,7 @@ final class SettingsPanel {
 			</section>
 		</div>
 
-		<div class="tagbridge-panel" id="tagbridge-panel-identity" role="tabpanel" aria-labelledby="tagbridge-tab-identity" tabindex="0" hidden>
+		<div class="tagbridge-panel" id="tagbridge-panel-<?php echo esc_attr( $this->id ); ?>-identity" role="tabpanel" aria-labelledby="tagbridge-tab-<?php echo esc_attr( $this->id ); ?>-identity" tabindex="0" hidden>
 			<section class="tagbridge-card">
 				<div class="tagbridge-card__head">
 					<h2 class="tagbridge-card__title"><?php esc_html_e( 'Identity', 'tagbridge' ); ?></h2>
@@ -211,7 +207,7 @@ final class SettingsPanel {
 					);
 					?>
 				</div>
-				<div class="tagbridge-card__body tagbridge-dependent" data-hp-dependent="identity">
+				<div class="tagbridge-card__body tagbridge-dependent" data-tagbridge-dependent="identity">
 					<p class="tagbridge-card__lead">
 						<?php esc_html_e( 'Tie logged-in users to one PostHog person with a hashed ID (never the raw user ID). Choose which properties to send.', 'tagbridge' ); ?>
 					</p>
@@ -243,7 +239,7 @@ final class SettingsPanel {
 			</section>
 		</div>
 
-		<div class="tagbridge-panel" id="tagbridge-panel-server" role="tabpanel" aria-labelledby="tagbridge-tab-server" tabindex="0" hidden>
+		<div class="tagbridge-panel" id="tagbridge-panel-<?php echo esc_attr( $this->id ); ?>-server" role="tabpanel" aria-labelledby="tagbridge-tab-<?php echo esc_attr( $this->id ); ?>-server" tabindex="0" hidden>
 			<section class="tagbridge-card">
 				<div class="tagbridge-card__head">
 					<h2 class="tagbridge-card__title"><?php esc_html_e( 'Server-side events', 'tagbridge' ); ?></h2>
@@ -257,7 +253,7 @@ final class SettingsPanel {
 					);
 					?>
 				</div>
-				<div class="tagbridge-card__body tagbridge-dependent" data-hp-dependent="server">
+				<div class="tagbridge-card__body tagbridge-dependent" data-tagbridge-dependent="server">
 					<p class="tagbridge-card__lead">
 						<?php esc_html_e( 'Send key events from your own WordPress server, so they still arrive when a visitor\'s browser blocks tracking. Runs on your existing hosting; nothing extra to set up.', 'tagbridge' ); ?>
 					</p>
@@ -379,7 +375,7 @@ final class SettingsPanel {
 	 */
 	private function head_switch( $group, $name, $master_key, $aria_label, $checked ) {
 		?>
-		<label class="tagbridge-headswitch" data-hp-master="<?php echo esc_attr( $master_key ); ?>">
+		<label class="tagbridge-headswitch" data-tagbridge-master="<?php echo esc_attr( $master_key ); ?>">
 			<span class="screen-reader-text"><?php echo esc_html( $aria_label ); ?></span>
 			<input
 				type="checkbox"

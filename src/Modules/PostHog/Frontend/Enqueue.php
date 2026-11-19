@@ -2,17 +2,17 @@
 /**
  * Front-end injection of posthog-js.
  *
- * Outputs the official posthog-js array loader and an init call configured from
- * the saved settings. The script loads from the configured host so self-hosted
- * and reverse-proxy installs work without code.
- *
  * @package Tagbridge\Modules\PostHog
  */
 
 namespace Tagbridge\Modules\PostHog\Frontend;
 
+use Tagbridge\Core\Privacy\ConsentCategory;
+use Tagbridge\Core\Privacy\Policy;
 use Tagbridge\Modules\PostHog\Identity;
 use Tagbridge\Modules\PostHog\Settings;
+use Tagbridge\Platform\Privacy\PrivacyGate;
+use Tagbridge\Platform\Settings\GlobalSettings;
 
 /**
  * Enqueues / prints the posthog-js snippet on the front end.
@@ -25,12 +25,11 @@ final class Enqueue {
 	 * @return void
 	 */
 	public function register() {
-		// Early in the head so autocapture and pageview fire as soon as possible.
 		add_action( 'wp_head', array( $this, 'print_snippet' ), 1 );
 	}
 
 	/**
-	 * Print the posthog-js loader and init, if the plugin is configured.
+	 * Print the posthog-js loader and init, respecting global privacy policies.
 	 *
 	 * @return void
 	 */
@@ -39,24 +38,95 @@ final class Enqueue {
 			return;
 		}
 
-		// Never load in contexts that are not real visitor page views.
 		if ( is_admin() || is_feed() || is_embed() ) {
 			return;
 		}
 
-		$key = Settings::project_api_key();
-		$js  = $this->loader() . "\n" . $this->init_call( $key, $this->build_config() );
+		$decision = PrivacyGate::decision( ConsentCategory::STATISTICS );
+		if ( in_array( $decision['reason'], array( 'role_excluded', 'dnt' ), true ) ) {
+			return;
+		}
 
-		// Tie a logged-in user to a stable PostHog person. Calling identify on
-		// the next page load after login merges the prior anonymous activity into
-		// the identified person. posthog-js de-duplicates repeat identify calls,
-		// so emitting this each page load does not spam $identify events.
-		$identify = $this->identify_call();
-		if ( '' !== $identify ) {
-			$js .= "\n" . $identify;
+		$key          = Settings::project_api_key();
+		$respect_dnt  = GlobalSettings::respect_dnt();
+		$consent_mode = GlobalSettings::consent_mode();
+
+		if ( 'consent_denied' === $decision['reason'] ) {
+			$init_js = $this->loader() . "\n" . $this->init_call( $key, $this->build_config( false ) );
+			$stub    = $this->consent_wait_stub( $init_js, $respect_dnt );
+			wp_print_inline_script_tag( $stub, array( 'id' => 'tagbridge-posthog-consent' ) );
+			return;
+		}
+
+		$forced_cookieless = ! empty( $decision['cookieless'] );
+		$js                = $this->loader() . "\n" . $this->init_call( $key, $this->build_config( $forced_cookieless ) );
+
+		if ( ! $forced_cookieless ) {
+			$identify = $this->identify_call();
+			if ( '' !== $identify ) {
+				$js .= "\n" . $identify;
+			}
+		}
+
+		if ( $respect_dnt ) {
+			$js = $this->wrap_dnt_guard( $js );
+		}
+
+		if ( Policy::CONSENT_OFF !== $consent_mode ) {
+			$client          = Settings::client();
+			$user_cookieless = ! empty( $client['cookieless'] );
+			$js             .= "\n" . $this->consent_change_listener( $forced_cookieless && ! $user_cookieless );
 		}
 
 		wp_print_inline_script_tag( $js, array( 'id' => 'tagbridge-posthog-js' ) );
+	}
+
+	/**
+	 * Build a lightweight WP Consent API listener that loads PostHog once consent is granted.
+	 *
+	 * @param string $init_js     PostHog loader and init JavaScript.
+	 * @param bool   $respect_dnt Whether to honor navigator.doNotTrack client-side.
+	 * @return string
+	 */
+	private function consent_wait_stub( $init_js, $respect_dnt ) {
+		$dnt_guard = $respect_dnt
+			? 'if(navigator.doNotTrack==="1"||window.doNotTrack==="1"){return;}'
+			: '';
+
+		return 'document.addEventListener("wp_listen_for_consent_change",function(e){'
+			. 'if(!e.detail||e.detail.statistics!=="allow"||window.__tagbridgePostHogLoaded){return;}'
+			. $dnt_guard
+			. 'window.__tagbridgePostHogLoaded=true;'
+			. $init_js
+			. '});';
+	}
+
+	/**
+	 * Listen for live consent changes after PostHog has initialized.
+	 *
+	 * @param bool $upgrade_persistence Whether to switch from memory to standard persistence on allow.
+	 * @return string
+	 */
+	private function consent_change_listener( $upgrade_persistence ) {
+		$allow_js = $upgrade_persistence
+			? 'if(window.posthog){if(window.posthog.set_config){window.posthog.set_config({persistence:"localStorage+cookie"});}if(window.posthog.opt_in_capturing){window.posthog.opt_in_capturing();}}'
+			: 'if(window.posthog&&window.posthog.opt_in_capturing){window.posthog.opt_in_capturing();}';
+
+		return 'document.addEventListener("wp_listen_for_consent_change",function(e){'
+			. 'if(!e.detail||typeof e.detail.statistics==="undefined"){return;}'
+			. 'if(e.detail.statistics==="deny"){if(window.posthog&&window.posthog.opt_out_capturing){window.posthog.opt_out_capturing();}}'
+			. 'else if(e.detail.statistics==="allow"){' . $allow_js . '}'
+			. '});';
+	}
+
+	/**
+	 * Wrap inline script in a client-side Do Not Track check (for cached pages).
+	 *
+	 * @param string $js Inline JavaScript.
+	 * @return string
+	 */
+	private function wrap_dnt_guard( $js ) {
+		return "(function(){\nif(navigator.doNotTrack===\"1\"||window.doNotTrack===\"1\"){return;}\n" . $js . "\n})();";
 	}
 
 	/**
@@ -81,14 +151,14 @@ final class Enqueue {
 	/**
 	 * Build the posthog.init config from settings.
 	 *
+	 * @param bool $force_cookieless Whether privacy policy requires memory-only persistence.
 	 * @return array<string,mixed>
 	 */
-	private function build_config() {
+	private function build_config( $force_cookieless = false ) {
 		$client = Settings::client();
 
 		$config = array(
 			'api_host'                  => Settings::host(),
-			// Pin to a dated defaults bundle so PostHog behavior is stable across releases.
 			'defaults'                  => '2026-01-30',
 			'autocapture'               => (bool) $client['autocapture'],
 			'capture_pageview'          => (bool) $client['pageviews'],
@@ -96,8 +166,7 @@ final class Enqueue {
 			'person_profiles'           => (string) $client['person_profiles'],
 		);
 
-		// Cookieless mode: keep all state in memory so no PostHog cookie is set.
-		if ( ! empty( $client['cookieless'] ) ) {
+		if ( $force_cookieless || ! empty( $client['cookieless'] ) ) {
 			$config['persistence'] = 'memory';
 		}
 

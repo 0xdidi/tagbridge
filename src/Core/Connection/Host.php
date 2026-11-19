@@ -2,10 +2,6 @@
 /**
  * PostHog host resolution and endpoint helpers.
  *
- * Platform-agnostic. Contains zero WordPress function calls: it takes plain
- * strings in and returns plain strings/bools out, so the future Shopify build
- * reuses it unchanged.
- *
  * @package Tagbridge\Core
  */
 
@@ -107,8 +103,6 @@ final class Host {
 		if ( ! filter_var( $url, FILTER_VALIDATE_URL ) ) {
 			return false;
 		}
-		// Core must not call WordPress functions, so wp_parse_url() is intentionally
-		// avoided here in favor of native parse_url().
 		$scheme = parse_url( $url, PHP_URL_SCHEME ); // phpcs:ignore WordPress.WP.AlternativeFunctions.parse_url_parse_url
 		$scheme = is_string( $scheme ) ? strtolower( $scheme ) : '';
 		return in_array( $scheme, array( 'http', 'https' ), true );

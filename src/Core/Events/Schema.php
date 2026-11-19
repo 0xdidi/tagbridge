@@ -2,10 +2,6 @@
 /**
  * Event taxonomy: the single source of truth for event names.
  *
- * Platform-agnostic. Listeners must never hardcode event-name strings; they
- * reference these constants so the names stay consistent everywhere (and so the
- * dashboards built on them keep working).
- *
  * @package Tagbridge\Core
  */
 

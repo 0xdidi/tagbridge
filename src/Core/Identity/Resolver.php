@@ -2,15 +2,6 @@
 /**
  * Identity resolver: the heart of identity stitching.
  *
- * Platform-agnostic. Contains zero WordPress function calls. It takes plain
- * inputs (a cookie value, a user id, a salt) and returns the distinct id and
- * person properties to use, so the client and the server resolve to one person.
- *
- * The browser library stores its state, including distinct_id, in a cookie
- * named ph_<project_api_key>_posthog as (URL-encoded) JSON. Reading that cookie
- * server-side and using the same distinct_id is what stitches client and server
- * events into a single person.
- *
  * @package Tagbridge\Core
  */
 
@@ -96,7 +87,6 @@ final class Resolver {
 
 		$decoded = json_decode( $cookie_value, true );
 
-		// Some servers/clients leave the value URL-encoded; try once more.
 		if ( ! is_array( $decoded ) && false !== strpos( $cookie_value, '%' ) ) {
 			$decoded = json_decode( rawurldecode( $cookie_value ), true );
 		}

@@ -2,12 +2,6 @@
 /**
  * PostHog identity glue.
  *
- * Bridges WordPress (cookies, the current user, site salt) to the
- * platform-agnostic identity Resolver. This is where the shared
- * ph_<project_api_key>_posthog cookie is read so the server and client resolve
- * to one person. The cookie name and the choice of person properties are
- * PostHog-specific, so this lives inside the module.
- *
  * @package Tagbridge\Modules\PostHog
  */
 
@@ -36,7 +30,6 @@ final class Identity {
 			return null;
 		}
 
-		// The cookie holds JSON; the extracted distinct id is sanitized below.
 		$raw = wp_unslash( $_COOKIE[ $name ] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 		$raw = is_string( $raw ) ? $raw : '';
 
@@ -80,7 +73,6 @@ final class Identity {
 
 		$distinct_id = Resolver::stable_user_id( $user->ID, self::salt() );
 
-		// Only send the person properties the site owner has opted into.
 		$raw_props = array();
 		if ( ! empty( $settings['send_email'] ) ) {
 			$raw_props['email'] = $user->user_email;

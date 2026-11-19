@@ -3,7 +3,7 @@
  * Plugin Name:       Tagbridge – Deep Integration for PostHog
  * Plugin URI:        https://github.com/0xdidi/tagbridge
  * Description:       Independent PostHog integration for WordPress. Connect your project, configure tracking, and send pageviews and events to PostHog. Not affiliated with PostHog.
- * Version:           0.2.2
+ * Version:           0.3.0
  * Requires at least: 5.8
  * Requires PHP:      8.2
  * Author:            Great Anthony
@@ -16,13 +16,11 @@
  * @package Tagbridge
  */
 
-// Prevent direct access.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-// Single source of truth for plugin metadata. Prefixed per coding standards.
-define( 'TAGBRIDGE_VERSION', '0.2.2' );
+define( 'TAGBRIDGE_VERSION', '0.3.0' );
 define( 'TAGBRIDGE_FILE', __FILE__ );
 define( 'TAGBRIDGE_DIR', plugin_dir_path( __FILE__ ) );
 define( 'TAGBRIDGE_URL', plugin_dir_url( __FILE__ ) );
@@ -46,7 +44,6 @@ function tagbridge_php_version_notice() {
 	printf( '<div class="notice notice-error"><p>%s</p></div>', wp_kses_post( $message ) );
 }
 
-// Guard the PHP version before loading any plugin code that may use newer syntax.
 if ( version_compare( PHP_VERSION, TAGBRIDGE_MIN_PHP, '<' ) ) {
 	add_action( 'admin_notices', 'tagbridge_php_version_notice' );
 	return;
@@ -80,13 +77,11 @@ function tagbridge_autoload( $class_name ) {
 }
 spl_autoload_register( 'tagbridge_autoload' );
 
-// Load vendored third-party libraries (posthog-php) when present.
 $tagbridge_vendor_autoload = TAGBRIDGE_DIR . 'vendor/autoload.php';
 if ( is_readable( $tagbridge_vendor_autoload ) ) {
 	require $tagbridge_vendor_autoload;
 }
 
-// Activation, deactivation, and uninstall hooks.
 register_activation_hook( __FILE__, array( '\Tagbridge\Platform\Plugin', 'activate' ) );
 register_deactivation_hook( __FILE__, array( '\Tagbridge\Platform\Plugin', 'deactivate' ) );
 

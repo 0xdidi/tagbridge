@@ -1,19 +1,3 @@
-/**
- * Tagbridge admin styles.
- *
- * Refined, restrained product UI for wp-admin (per docs/05_DESIGN.md): warm
- * cream and olive-ink neutrals, a single yellow-orange action, honest status
- * colors, a characterful rounded-display face for headings with the system font
- * for body, hairline borders, small radii, minimal shadow, no gradients.
- *
- * Tokens are defined once as custom properties and never hardcoded inline.
- * Structure: a brand hero band in the accent color, a tab bar that splits the
- * sections into focused panels, cards whose header carries the section's master
- * control/status, and settings rows (label left, control right).
- */
-
-/* Bundled wordmark/heading face: Sora (SIL OFL 1.1), shipped locally so we
-   never call a third-party font CDN at runtime. Variable woff2 covers 600-700. */
 @font-face {
 	font-family: "Tagbridge Sora";
 	font-style: normal;
@@ -23,8 +7,7 @@
 }
 
 .tagbridge-wrap {
-	/* Color tokens. */
-	--hp-ink: #23251d;
+		--hp-ink: #23251d;
 	--hp-ink-soft: #4d4f46;
 	--hp-ink-faint: #74766c;
 	--hp-canvas: #ffffff;
@@ -34,20 +17,16 @@
 	--hp-accent: #f7a501;
 	--hp-accent-hover: #e59800;
 	--hp-accent-ink: #23251d;
-	--hp-brand-red: #f54e00; /* brand moments only, never status */
-	--hp-success: #2f8a4e;
+	--hp-brand-red: #f54e00; 	--hp-success: #2f8a4e;
 	--hp-success-soft: #eaf5ee;
 	--hp-warning: #b8860b;
 	--hp-error: #c0392b;
 	--hp-error-soft: #fbecea;
 
-	/* Type tokens. Heading face is the bundled Sora, with a rounded
-	   geometric system fallback while the woff2 loads. */
-	--hp-font-title: "Tagbridge Sora", ui-rounded, "SF Pro Rounded", "Hiragino Maru Gothic ProN", Quicksand, Nunito, "Segoe UI", system-ui, sans-serif;
+		--hp-font-title: "Tagbridge Sora", ui-rounded, "SF Pro Rounded", "Hiragino Maru Gothic ProN", Quicksand, Nunito, "Segoe UI", system-ui, sans-serif;
 	--hp-font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
 
-	/* Shape + motion tokens. */
-	--hp-radius: 10px;
+		--hp-radius: 10px;
 	--hp-radius-sm: 6px;
 	--hp-shadow-card: 0 1px 2px rgba(35, 37, 29, 0.04);
 	--hp-ease: cubic-bezier(0.22, 1, 0.36, 1);
@@ -58,7 +37,6 @@
 	color: var(--hp-ink-soft);
 }
 
-/* ---- Brand hero band ---- */
 .tagbridge-hero {
 	display: flex;
 	align-items: center;
@@ -80,8 +58,6 @@
 	min-width: 0;
 }
 
-/* Brand mark, rendered inline as SVG. Uses currentColor so it reads as ink on
-   the accent hero band. */
 .tagbridge-hero__mark {
 	display: inline-flex;
 	flex: 0 0 auto;
@@ -135,7 +111,6 @@
 	text-decoration: underline;
 }
 
-/* Status pill (sits in the hero on the accent fill). */
 .tagbridge-pill {
 	display: inline-flex;
 	align-items: center;
@@ -168,7 +143,6 @@
 	opacity: 1;
 }
 
-/* ---- Tabs ---- */
 .tagbridge-tabs {
 	display: flex;
 	flex-wrap: wrap;
@@ -210,7 +184,6 @@
 	border-bottom-color: var(--hp-accent);
 }
 
-/* ---- Panels ---- */
 .tagbridge-panel[hidden] {
 	display: none;
 }
@@ -219,7 +192,6 @@
 	outline: none;
 }
 
-/* ---- Flash messages ---- */
 .tagbridge-flash {
 	border: 1px solid var(--hp-border-strong);
 	border-left-width: 3px;
@@ -241,7 +213,6 @@
 	background: var(--hp-error-soft);
 }
 
-/* ---- Cards ---- */
 .tagbridge-card {
 	background: var(--hp-canvas);
 	border: 1px solid var(--hp-border);
@@ -282,7 +253,6 @@
 	max-width: 64ch;
 }
 
-/* Minimal dot + text status (e.g. "Connected"), no border or background. */
 .tagbridge-status {
 	display: inline-flex;
 	align-items: center;
@@ -309,7 +279,6 @@
 	background: var(--hp-success);
 }
 
-/* ---- Stacked fields (connection inputs) ---- */
 .tagbridge-field {
 	margin: 16px 0;
 }
@@ -356,7 +325,6 @@
 	color: var(--hp-ink-faint);
 }
 
-/* ---- Settings rows (label left, control right) ---- */
 .tagbridge-row {
 	display: flex;
 	align-items: center;
@@ -399,7 +367,6 @@
 	margin-top: 3px;
 }
 
-/* Dependent body dims when its master switch is off. */
 .tagbridge-dependent.is-muted {
 	opacity: 0.45;
 }
@@ -408,7 +375,6 @@
 	pointer-events: none;
 }
 
-/* ---- Switch ---- */
 .tagbridge-switch__input {
 	position: absolute;
 	opacity: 0;
@@ -456,19 +422,16 @@
 	outline-offset: 2px;
 }
 
-/* Head switch (master control inside a card header). */
 .tagbridge-headswitch {
 	display: inline-flex;
 	align-items: center;
 	cursor: pointer;
 }
 
-/* Select used inside a settings row. */
 .tagbridge-row .tagbridge-input {
 	max-width: 260px;
 }
 
-/* ---- Action bar ---- */
 .tagbridge-actionbar {
 	display: flex;
 	align-items: center;
@@ -503,7 +466,278 @@
 	color: var(--hp-ink-faint);
 }
 
-/* ---- Integration module (one card per integration in the shell) ---- */
+.tagbridge-nav {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+	margin: 16px 0 20px;
+	border-bottom: 1px solid var(--hp-border);
+}
+
+.tagbridge-nav__link {
+	display: inline-flex;
+	align-items: center;
+	padding: 10px 16px;
+	margin-bottom: -1px;
+	font-family: var(--hp-font-title);
+	font-weight: 600;
+	font-size: 14px;
+	color: var(--hp-ink-soft);
+	text-decoration: none;
+	border-bottom: 2px solid transparent;
+	border-radius: var(--hp-radius-sm) var(--hp-radius-sm) 0 0;
+	transition: color var(--hp-dur) var(--hp-ease), border-color var(--hp-dur) var(--hp-ease), background var(--hp-dur) var(--hp-ease);
+}
+
+.tagbridge-nav__link:hover,
+.tagbridge-nav__link:focus {
+	color: var(--hp-ink);
+	background: var(--hp-canvas-soft);
+	box-shadow: none;
+}
+
+.tagbridge-nav__link.is-active {
+	color: var(--hp-ink);
+	border-bottom-color: var(--hp-accent);
+}
+
+.tagbridge-hub {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+	gap: 18px;
+}
+
+.tagbridge-integration {
+	display: flex;
+	flex-direction: column;
+	background: var(--hp-canvas);
+	border: 1px solid var(--hp-border);
+	border-radius: var(--hp-radius);
+	box-shadow: var(--hp-shadow-card);
+	overflow: hidden;
+}
+
+.tagbridge-integration.is-disabled .tagbridge-integration__desc {
+	opacity: 0.65;
+}
+
+.tagbridge-integration__head {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	padding: 18px 20px 14px;
+	border-bottom: 1px solid var(--hp-border);
+	background: var(--hp-canvas-soft);
+}
+
+.tagbridge-integration__titles {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 4px;
+	min-width: 0;
+	flex: 1 1 auto;
+}
+
+.tagbridge-integration__name {
+	font-family: var(--hp-font-title);
+	font-weight: 700;
+	font-size: 17px;
+	line-height: 1.2;
+	color: var(--hp-ink);
+	margin: 0;
+	padding: 0;
+}
+
+.tagbridge-badge {
+	display: inline-block;
+	vertical-align: middle;
+	padding: 2px 8px;
+	border-radius: 999px;
+	font-family: inherit;
+	font-size: 11px;
+	font-weight: 600;
+	line-height: 1.4;
+	color: var(--hp-ink-soft);
+	background: var(--hp-canvas);
+	border: 1px solid var(--hp-border);
+}
+
+.tagbridge-integration__desc {
+	flex: 1 1 auto;
+	margin: 0;
+	padding: 16px 20px;
+	font-size: 13px;
+	line-height: 1.5;
+	color: var(--hp-ink-soft);
+}
+
+.tagbridge-integration__foot {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	padding: 12px 20px;
+	border-top: 1px solid var(--hp-border);
+	background: var(--hp-canvas);
+}
+
+.tagbridge-btn-secondary.button-secondary {
+	border-color: var(--hp-border-strong);
+	color: var(--hp-ink);
+	background: var(--hp-canvas);
+	font-weight: 600;
+}
+
+.tagbridge-btn-secondary.button-secondary:hover,
+.tagbridge-btn-secondary.button-secondary:focus {
+	border-color: var(--hp-ink);
+	color: var(--hp-ink);
+	background: var(--hp-canvas-soft);
+}
+
+.tagbridge-hub__meta {
+	margin: 16px 0 0;
+	font-size: 12px;
+	color: var(--hp-ink-faint);
+}
+
+.tagbridge-toggle-form {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	margin: 0;
+}
+
+.tagbridge-section-title {
+	font-family: var(--hp-font-title);
+	font-weight: 700;
+	font-size: 19px;
+	line-height: 1.2;
+	color: var(--hp-ink);
+	margin: 28px 0 4px;
+}
+
+.tagbridge-section-lead {
+	font-size: 13px;
+	color: var(--hp-ink-soft);
+	margin: 0 0 16px;
+	max-width: 68ch;
+}
+
+.tagbridge-integration--upcoming .tagbridge-integration__head {
+	background: var(--hp-canvas);
+}
+
+.tagbridge-badge--soon {
+	margin-left: auto;
+	white-space: nowrap;
+	background: var(--hp-canvas-soft);
+	color: var(--hp-ink-soft);
+}
+
+.tagbridge-notify-form {
+	margin: 0;
+}
+
+.tagbridge-btn-notify-active.button-secondary {
+	border-color: var(--hp-success);
+	color: var(--hp-success);
+	background: var(--hp-success-soft);
+	font-weight: 600;
+}
+
+.tagbridge-btn-notify-active.button-secondary:hover,
+.tagbridge-btn-notify-active.button-secondary:focus {
+	border-color: var(--hp-success);
+	color: var(--hp-success);
+	background: var(--hp-success-soft);
+}
+
+.tagbridge-detail-bar {
+	margin: 0 0 14px;
+}
+
+.tagbridge-back {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	font-size: 13px;
+	font-weight: 600;
+	color: var(--hp-ink-soft);
+	text-decoration: none;
+}
+
+.tagbridge-back:hover,
+.tagbridge-back:focus {
+	color: var(--hp-ink);
+	text-decoration: underline;
+}
+
+.tagbridge-module__actions {
+	display: flex;
+	align-items: center;
+	gap: 14px;
+	flex: 0 0 auto;
+}
+
+.tagbridge-banner {
+	padding: 12px 24px;
+	border-bottom: 1px solid var(--hp-border);
+	background: var(--hp-canvas-soft);
+	font-size: 13px;
+	color: var(--hp-ink-soft);
+}
+
+.tagbridge-actionbar--inset {
+	padding: 0 24px 22px;
+	margin-top: 4px;
+}
+
+.tagbridge-roles-grid {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 10px 18px;
+	margin: 14px 0 6px;
+}
+
+.tagbridge-role-item {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	padding: 10px 14px;
+	border: 1px solid var(--hp-border);
+	border-radius: var(--hp-radius-sm);
+	background: var(--hp-canvas-soft);
+	cursor: pointer;
+}
+
+.tagbridge-role-item:hover,
+.tagbridge-role-item:focus-within {
+	border-color: var(--hp-border-strong);
+}
+
+.tagbridge-role-item__name {
+	font-size: 13px;
+	font-weight: 600;
+	color: var(--hp-ink);
+}
+
+.tagbridge-source-row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 16px;
+	padding: 14px 24px;
+	margin: 0 -24px;
+	border-top: 1px solid var(--hp-border);
+}
+
+.tagbridge-source-row:first-of-type {
+	border-top: 0;
+}
+
 .tagbridge-module {
 	background: var(--hp-canvas);
 	border: 1px solid var(--hp-border);
@@ -531,6 +765,27 @@
 	color: var(--hp-ink);
 }
 
+.tagbridge-module__icon--img {
+	width: 36px;
+	height: 36px;
+	flex: 0 0 auto;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 6px;
+	box-sizing: border-box;
+	background: var(--hp-canvas);
+	border: 1px solid var(--hp-border);
+	border-radius: 8px;
+}
+
+.tagbridge-module__icon--img img {
+	width: 100%;
+	height: 100%;
+	object-fit: contain;
+	display: block;
+}
+
 .tagbridge-module__titles {
 	display: flex;
 	flex-direction: column;
@@ -539,6 +794,10 @@
 }
 
 .tagbridge-module__name {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	flex-wrap: wrap;
 	font-family: var(--hp-font-title);
 	font-weight: 700;
 	font-size: 18px;
@@ -560,25 +819,10 @@
 	padding: 20px 24px 8px;
 }
 
-/* When the integration is off, dim and disable its settings body. */
-.tagbridge-module.is-disabled .tagbridge-module__body {
-	opacity: 0.45;
-}
-
-.tagbridge-module.is-disabled .tagbridge-module__body .tagbridge-tab,
-.tagbridge-module.is-disabled .tagbridge-module__body .tagbridge-row,
-.tagbridge-module.is-disabled .tagbridge-module__body input,
-.tagbridge-module.is-disabled .tagbridge-module__body select {
-	pointer-events: none;
-}
-
-/* The settings cards inside a module body have no outer border (the module
-   wrapper already provides one), so they read as nested sections. */
 .tagbridge-module__body .tagbridge-card {
 	border-color: var(--hp-border);
 }
 
-/* ---- Responsive ---- */
 @media screen and (max-width: 782px) {
 	.tagbridge-hero {
 		align-items: flex-start;
@@ -595,6 +839,14 @@
 
 	.tagbridge-row {
 		gap: 12px;
+	}
+
+	.tagbridge-roles-grid {
+		grid-template-columns: 1fr;
+	}
+
+	.tagbridge-module__head {
+		flex-wrap: wrap;
 	}
 }
 

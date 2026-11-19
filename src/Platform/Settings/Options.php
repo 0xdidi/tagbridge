@@ -2,11 +2,6 @@
 /**
  * Settings storage for the whole plugin.
  *
- * Holds one option array shared by every module. The top-level "modules" key is
- * an enabled map; each module stores its own settings under its id. Modules read
- * and write their slice through here so storage stays in one place while each
- * module owns the shape of its own data.
- *
  * @package Tagbridge\Platform
  */
 
@@ -114,6 +109,79 @@ final class Options {
 	public static function save_module_data( $id, array $data ) {
 		$all        = self::all();
 		$all[ $id ] = $data;
+		update_option( self::OPTION_KEY, $all );
+		self::$cache = null;
+	}
+
+	/**
+	 * The raw stored global platform settings (no defaults merged in).
+	 *
+	 * @return array<string,mixed>
+	 */
+	public static function global_data() {
+		$all = self::all();
+		return ( isset( $all['global'] ) && is_array( $all['global'] ) ) ? $all['global'] : array();
+	}
+
+	/**
+	 * Persist global platform settings while leaving module slices intact.
+	 *
+	 * @param array<string,mixed> $data Sanitized global settings.
+	 * @return void
+	 */
+	public static function save_global_data( array $data ) {
+		$all           = self::all();
+		$all['global'] = $data;
+		update_option( self::OPTION_KEY, $all );
+		self::$cache = null;
+	}
+
+	/**
+	 * Upcoming integration ids the site owner asked to be notified about.
+	 *
+	 * @return string[]
+	 */
+	public static function watchlist() {
+		$all = self::all();
+		return ( isset( $all['watchlist'] ) && is_array( $all['watchlist'] ) )
+			? array_values( $all['watchlist'] )
+			: array();
+	}
+
+	/**
+	 * Whether an upcoming integration id is currently on the launch watchlist.
+	 *
+	 * @param string $id Upcoming integration id.
+	 * @return bool
+	 */
+	public static function is_watched( $id ) {
+		return in_array( (string) $id, self::watchlist(), true );
+	}
+
+	/**
+	 * Add or remove an upcoming integration id from the local launch watchlist.
+	 *
+	 * @param string $id      Upcoming integration id.
+	 * @param bool   $watched True to watch, false to remove.
+	 * @return void
+	 */
+	public static function set_watched( $id, $watched ) {
+		$id = (string) $id;
+		if ( '' === $id ) {
+			return;
+		}
+
+		$all  = self::all();
+		$list = self::watchlist();
+
+		if ( $watched ) {
+			$list[] = $id;
+			$list   = array_values( array_unique( $list ) );
+		} else {
+			$list = array_values( array_diff( $list, array( $id ) ) );
+		}
+
+		$all['watchlist'] = $list;
 		update_option( self::OPTION_KEY, $all );
 		self::$cache = null;
 	}

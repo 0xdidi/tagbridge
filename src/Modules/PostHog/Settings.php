@@ -2,10 +2,6 @@
 /**
  * PostHog module settings: defaults, typed accessors, and sanitization.
  *
- * Reads and writes this module's slice of the shared option through the
- * platform Options store. Everything PostHog-specific about settings lives here
- * so the rest of the module asks one place for a value.
- *
  * @package Tagbridge\Modules\PostHog
  */
 
@@ -75,7 +71,6 @@ final class Settings {
 		$defaults = self::defaults();
 		$merged   = array_merge( $defaults, $stored );
 
-		// Deep-merge each known sub-array so partial stored data keeps defaults.
 		foreach ( array( 'client', 'identity', 'server_events' ) as $group ) {
 			$merged[ $group ] = array_merge(
 				$defaults[ $group ],
@@ -202,25 +197,21 @@ final class Settings {
 	public static function sanitize( array $input ) {
 		$current = self::all();
 
-		// Project API key: keep to a safe character set.
 		if ( isset( $input['project_api_key'] ) ) {
 			$key                        = sanitize_text_field( wp_unslash( $input['project_api_key'] ) );
 			$current['project_api_key'] = preg_replace( '/[^A-Za-z0-9_\-]/', '', $key );
 		}
 
-		// Region: must be one of the known regions.
 		if ( isset( $input['region'] ) ) {
 			$region            = sanitize_text_field( wp_unslash( $input['region'] ) );
 			$current['region'] = in_array( $region, Host::regions(), true ) ? $region : Host::REGION_US;
 		}
 
-		// Custom host: store the normalized URL form.
 		if ( isset( $input['custom_host'] ) ) {
 			$raw                    = esc_url_raw( wp_unslash( $input['custom_host'] ) );
 			$current['custom_host'] = Host::normalize_url( $raw );
 		}
 
-		// Client toggles. Checkboxes are present only when checked.
 		$client = $current['client'];
 		if ( isset( $input['client'] ) && is_array( $input['client'] ) ) {
 			$raw_client                  = wp_unslash( $input['client'] );
@@ -238,8 +229,6 @@ final class Settings {
 		}
 		$current['client'] = $client;
 
-		// Identity toggles. A hidden marker ensures this is processed even when
-		// every checkbox is unchecked (unchecked checkboxes are not posted).
 		if ( isset( $input['identity'] ) && is_array( $input['identity'] ) ) {
 			$raw_identity                   = wp_unslash( $input['identity'] );
 			$identity                       = $current['identity'];
@@ -250,7 +239,6 @@ final class Settings {
 			$current['identity']            = $identity;
 		}
 
-		// Server-side event toggles (master + per-event). Hidden marker as above.
 		if ( isset( $input['server_events'] ) && is_array( $input['server_events'] ) ) {
 			$raw_server = wp_unslash( $input['server_events'] );
 			$server     = $current['server_events'];

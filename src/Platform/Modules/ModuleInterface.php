@@ -2,10 +2,6 @@
 /**
  * Integration module contract.
  *
- * A module is one self-contained integration (PostHog today; Segment, GA4, and
- * others later). The registry only instantiates and boots a module when it is
- * enabled, so a disabled module's runtime code is never loaded.
- *
  * @package Tagbridge\Platform
  */
 
@@ -38,11 +34,25 @@ interface ModuleInterface {
 	public function description();
 
 	/**
-	 * A Dashicons class used as the module's icon in the admin.
+	 * Integration icon: a plugin-relative image path, URL, or Dashicons class.
 	 *
 	 * @return string
 	 */
 	public function icon();
+
+	/**
+	 * Integration category slug for grouping in the hub (e.g. analytics, ads).
+	 *
+	 * @return string
+	 */
+	public function category();
+
+	/**
+	 * WordPress Consent API category governing this integration.
+	 *
+	 * @return string One of the Tagbridge\Core\Privacy\ConsentCategory constants.
+	 */
+	public function consent_category();
 
 	/**
 	 * Wire the module's runtime hooks. Only called when the module is enabled.

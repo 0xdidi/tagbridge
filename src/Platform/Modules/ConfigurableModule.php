@@ -2,10 +2,6 @@
 /**
  * Contract for modules that expose a settings panel.
  *
- * The admin shell (SettingsPage) owns the page chrome, nonce, and save flow; a
- * configurable module supplies its own defaults, sanitizer, optional pre-save
- * validation, and the body of its settings panel.
- *
  * @package Tagbridge\Platform
  */
 

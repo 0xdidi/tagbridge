@@ -58,7 +58,6 @@ final class ResolverTest extends TestCase {
 	}
 
 	public function test_stable_user_id_does_not_leak_the_raw_id() {
-		// The id must be a hash, not just the raw user id appended to the prefix.
 		$id = Resolver::stable_user_id( 42, 'salt-1' );
 		$this->assertNotSame( 'wp_42', $id );
 		$this->assertSame( 64, strlen( substr( $id, 3 ) ) ); // sha256 hex.

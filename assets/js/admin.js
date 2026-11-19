@@ -1,32 +1,15 @@
-/**
- * Tagbridge admin script.
- *
- * Dependency-free progressive enhancement:
- *  - enable/disable a whole integration module from its header switch;
- *  - switch between settings tabs (one panel visible at a time);
- *  - show the custom host field only when "self-hosted" is selected;
- *  - dim a section's dependent rows when its master switch is off.
- */
 ( function () {
 	'use strict';
 
-	function initModules() {
-		var modules = document.querySelectorAll( '[data-tagbridge-module]' );
+	function initToggleForms() {
+		var toggles = document.querySelectorAll( '[data-tagbridge-auto-submit]' );
 
-		Array.prototype.forEach.call( modules, function ( module ) {
-			var toggle = module.querySelector(
-				'.tagbridge-module__toggle input[type="checkbox"]'
-			);
-			if ( ! toggle ) {
-				return;
-			}
-
-			function sync() {
-				module.classList.toggle( 'is-disabled', ! toggle.checked );
-			}
-
-			toggle.addEventListener( 'change', sync );
-			sync();
+		Array.prototype.forEach.call( toggles, function ( input ) {
+			input.addEventListener( 'change', function () {
+				if ( input.form ) {
+					input.form.submit();
+				}
+			} );
 		} );
 	}
 
@@ -41,8 +24,6 @@
 				return;
 			}
 
-			// Scope panels to the module this tablist belongs to, so multiple
-			// modules on one page do not toggle each other's panels.
 			var scope = tablist.closest( '[data-tagbridge-module]' ) || document;
 
 			function panelFor( tab ) {
@@ -102,45 +83,56 @@
 		} );
 	}
 
-	function initRegion() {
-		var region = document.querySelector( '[data-tagbridge-region]' );
-		var customHost = document.querySelector( '[data-tagbridge-custom-host]' );
-
-		if ( ! region || ! customHost ) {
-			return;
-		}
-
-		function sync() {
-			customHost.hidden = 'custom' !== region.value;
-		}
-
-		region.addEventListener( 'change', sync );
-		sync();
+	function moduleScopes() {
+		var modules = document.querySelectorAll( '[data-tagbridge-module]' );
+		return modules.length ? Array.prototype.slice.call( modules ) : [ document ];
 	}
 
-	function initMasters() {
-		var masters = document.querySelectorAll( '[data-hp-master]' );
+	function initRegion() {
+		moduleScopes().forEach( function ( scope ) {
+			var region = scope.querySelector( '[data-tagbridge-region]' );
+			var customHost = scope.querySelector( '[data-tagbridge-custom-host]' );
 
-		Array.prototype.forEach.call( masters, function ( master ) {
-			var key = master.getAttribute( 'data-hp-master' );
-			var body = document.querySelector( '[data-hp-dependent="' + key + '"]' );
-			var input = master.querySelector( 'input[type="checkbox"]' );
-
-			if ( ! body || ! input ) {
+			if ( ! region || ! customHost ) {
 				return;
 			}
 
 			function sync() {
-				body.classList.toggle( 'is-muted', ! input.checked );
+				customHost.hidden = 'custom' !== region.value;
 			}
 
-			input.addEventListener( 'change', sync );
+			region.addEventListener( 'change', sync );
 			sync();
 		} );
 	}
 
+	function initMasters() {
+		moduleScopes().forEach( function ( scope ) {
+			var masters = scope.querySelectorAll( '[data-tagbridge-master], [data-hp-master]' );
+
+			Array.prototype.forEach.call( masters, function ( master ) {
+				var key = master.getAttribute( 'data-tagbridge-master' ) || master.getAttribute( 'data-hp-master' );
+				var body = scope.querySelector(
+					'[data-tagbridge-dependent="' + key + '"], [data-hp-dependent="' + key + '"]'
+				);
+				var input = master.querySelector( 'input[type="checkbox"]' );
+
+				if ( ! body || ! input ) {
+					return;
+				}
+
+				function sync() {
+					body.classList.toggle( 'is-muted', ! input.checked );
+				}
+
+				input.addEventListener( 'change', sync );
+				sync();
+			} );
+		} );
+	}
+
 	function init() {
-		initModules();
+		initToggleForms();
 		initTabs();
 		initRegion();
 		initMasters();

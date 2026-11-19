@@ -12,7 +12,6 @@
 $tagbridge_autoload = dirname( __DIR__, 2 ) . '/vendor/autoload.php';
 
 if ( ! is_readable( $tagbridge_autoload ) ) {
-	// This is a CLI test bootstrap; WordPress (and WP_Filesystem) is not loaded here.
 	fwrite( STDERR, "Could not find vendor/autoload.php. Run 'composer install' first.\n" ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fwrite
 	exit( 1 );
 }

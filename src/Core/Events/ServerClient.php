@@ -2,11 +2,6 @@
 /**
  * Server-side PostHog client.
  *
- * Platform-agnostic wrapper around posthog-php. Every call is wrapped so a
- * PostHog problem (timeout, bad host, rate limit) is swallowed and never
- * surfaces to the visitor. Uses only the posthog-php library and native PHP, no
- * WordPress functions.
- *
  * @package Tagbridge\Core
  */
 

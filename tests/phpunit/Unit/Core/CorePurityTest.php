@@ -65,7 +65,6 @@ final class CorePurityTest extends TestCase {
 				continue;
 			}
 
-			// Next non-whitespace token must be an opening parenthesis.
 			$j = $i + 1;
 			while ( $j < $count && is_array( $tokens[ $j ] ) && T_WHITESPACE === $tokens[ $j ][0] ) {
 				++$j;
@@ -74,7 +73,6 @@ final class CorePurityTest extends TestCase {
 				continue;
 			}
 
-			// Previous non-whitespace token must not make this a method/def/new.
 			$k = $i - 1;
 			while ( $k >= 0 && is_array( $tokens[ $k ] ) && T_WHITESPACE === $tokens[ $k ][0] ) {
 				--$k;
@@ -101,7 +99,6 @@ final class CorePurityTest extends TestCase {
 		$failures = array();
 
 		foreach ( $this->core_files() as $file ) {
-			// Reading a local source file in a test; WP_Filesystem is not loaded here.
 			$code = file_get_contents( $file ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
 			foreach ( $this->called_functions( $code ) as $fn ) {
 				if ( ! isset( $internal[ $fn ] ) ) {

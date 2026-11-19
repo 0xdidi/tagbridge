@@ -2,10 +2,6 @@
 /**
  * Validates a PostHog project API key and host with a live test call.
  *
- * This is WordPress glue: it uses the HTTP API. The endpoint and response
- * meaning come from Core\Connection\Host. The call hits the public, read-only
- * flags endpoint, so it never ingests a test event.
- *
  * @package Tagbridge\Modules\PostHog
  */
 
