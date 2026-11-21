@@ -47,6 +47,17 @@ composer test:unit  # PHPUnit unit tests (Core, Platform, Modules)
 bin/build-zip.sh    # produces dist/tagbridge.zip (production files only)
 ```
 
+### Release
+
+Pushing a version tag (`git tag vX.Y.Z && git push origin vX.Y.Z`) automatically runs lint and unit tests, builds `dist/tagbridge.zip`, and publishes the GitHub Release via `.github/workflows/release.yml`.
+
+To publish or update a GitHub Release locally, or stage a WordPress.org SVN release:
+
+```bash
+bin/release-github.sh   # build dist/tagbridge.zip and publish GitHub Release for current tag
+bin/deploy-svn.sh       # stage trunk, tag, and .wordpress-org assets in ~/Projects/tagbridge-svn
+```
+
 ## Repository layout
 
 ```

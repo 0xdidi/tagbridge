@@ -63,8 +63,10 @@ By default PostHog uses its normal storage. Turn on "Cookieless mode" in PostHog
 
 == Screenshots ==
 
-1. Connect your PostHog project: paste the project API key and choose your region. The key is checked with PostHog before it is saved.
-2. Once connected, choose what to track with plain-language toggles: pageviews, autocapture, session recording, person profiles, and cookieless mode.
+1. Integrations Hub: enable or disable integrations in one click, and browse upcoming modules with local in-WordPress launch alerts.
+2. Connect your PostHog project: paste the project API key and choose US cloud, EU cloud, or a self-hosted / reverse-proxy host. The key is checked before saving.
+3. Choose what PostHog tracks with plain-language toggles for pageviews, autocapture, session recording, cookieless mode, and person profiles.
+4. Privacy & Settings: configure the WordPress Consent API, Do Not Track, and role exclusions once across every integration.
 
 == External services ==
 
