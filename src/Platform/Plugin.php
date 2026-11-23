@@ -9,6 +9,7 @@ namespace Tagbridge\Platform;
 
 use Tagbridge\Core\Privacy\ConsentCategory;
 use Tagbridge\Modules\PostHog\Module as PostHogModule;
+use Tagbridge\Modules\Webhooks\Module as WebhooksModule;
 use Tagbridge\Platform\Admin\Notices;
 use Tagbridge\Platform\Admin\SettingsPage;
 use Tagbridge\Platform\Events\EventBus;
@@ -82,7 +83,7 @@ final class Plugin {
 	 */
 	private function manifest() {
 		$manifest = array(
-			'posthog' => array(
+			'posthog'  => array(
 				'class'            => PostHogModule::class,
 				'default'          => true,
 				'label'            => static function () {
@@ -94,6 +95,19 @@ final class Plugin {
 				'category'         => 'analytics',
 				'consent_category' => ConsentCategory::STATISTICS,
 				'icon'             => 'assets/icons/posthog.svg',
+			),
+			'webhooks' => array(
+				'class'            => WebhooksModule::class,
+				'default'          => false,
+				'label'            => static function () {
+					return __( 'Webhooks', 'tagbridge' );
+				},
+				'description'      => static function () {
+					return __( 'Send signed JSON event payloads to Zapier, Make, n8n, or your own endpoint.', 'tagbridge' );
+				},
+				'category'         => 'automation',
+				'consent_category' => ConsentCategory::FUNCTIONAL,
+				'icon'             => 'assets/icons/webhooks.svg',
 			),
 		);
 
