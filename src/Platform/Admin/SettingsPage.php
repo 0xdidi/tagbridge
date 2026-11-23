@@ -137,8 +137,8 @@ final class SettingsPage {
 	 * @return string
 	 */
 	private function menu_icon() {
-		$svg = '<svg width="20" height="20" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">'
-			. '<path d="M18 42 C 18 16, 46 16, 46 42" stroke="black" stroke-width="6" stroke-linecap="round" fill="none"/>'
+		$svg = '<svg width="20" height="20" viewBox="8 8 48 48" xmlns="http://www.w3.org/2000/svg">'
+			. '<path d="M15 42 C 15 12, 49 12, 49 42 L 43 42 C 43 20, 21 20, 21 42 Z" fill="black"/>'
 			. '<circle cx="18" cy="42" r="6" fill="black"/>'
 			. '<circle cx="46" cy="42" r="6" fill="black"/>'
 			. '</svg>';
@@ -472,6 +472,7 @@ final class SettingsPage {
 		?>
 		<div class="wrap tagbridge-wrap">
 			<?php $this->render_hero( $active_nav ); ?>
+			<hr class="wp-header-end" />
 
 			<?php if ( $flash ) : ?>
 				<div class="tagbridge-flash tagbridge-flash--<?php echo esc_attr( 'success' === $flash['type'] ? 'ok' : 'error' ); ?>">
