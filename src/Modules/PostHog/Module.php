@@ -14,6 +14,7 @@ use Tagbridge\Core\Events\ServerClient;
 use Tagbridge\Core\Privacy\ConsentCategory;
 use Tagbridge\Modules\PostHog\Connection\Validator;
 use Tagbridge\Modules\PostHog\Events\Dispatcher;
+use Tagbridge\Modules\PostHog\Flags\FeatureFlagBlock;
 use Tagbridge\Modules\PostHog\Frontend\Enqueue;
 use Tagbridge\Platform\Modules\ConfigurableModule;
 use Tagbridge\Platform\Modules\EventSubscriberInterface;
@@ -126,6 +127,7 @@ final class Module implements ConfigurableModule, EventSubscriberInterface {
 	 */
 	public function boot() {
 		( new Enqueue() )->register();
+		( new FeatureFlagBlock() )->register();
 
 		add_filter( 'tagbridge_order_checkout_meta', array( $this, 'capture_order_distinct_id' ), 10, 2 );
 		add_action( 'admin_post_' . self::ACTION_TEST_EVENT, array( $this, 'handle_test_event' ) );
