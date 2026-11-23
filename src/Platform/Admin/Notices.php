@@ -184,6 +184,14 @@ final class Notices {
 			return;
 		}
 
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$current_page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : '';
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$current_module = isset( $_GET['module'] ) ? sanitize_key( wp_unslash( $_GET['module'] ) ) : '';
+		if ( SettingsPage::SLUG === $current_page && '' !== $current_module && 1 === count( $launched ) && isset( $launched[ $current_module ] ) ) {
+			return;
+		}
+
 		$labels = array();
 		foreach ( $launched as $meta ) {
 			$labels[] = $meta['label'];
