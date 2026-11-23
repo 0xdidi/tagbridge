@@ -34,6 +34,27 @@ final class Resolver {
 	const USER_ID_PREFIX = 'wp_';
 
 	/**
+	 * Key posthog-js stores session state under inside its cookie.
+	 *
+	 * @var string
+	 */
+	const SESSION_ID_KEY = '$sesid';
+
+	/**
+	 * Idle window in milliseconds before posthog-js rotates session id.
+	 *
+	 * @var int
+	 */
+	const SESSION_MAX_IDLE_MS = 1800000;
+
+	/**
+	 * Maximum session length in milliseconds allowed by PostHog.
+	 *
+	 * @var int
+	 */
+	const SESSION_MAX_LENGTH_MS = 86400000;
+
+	/**
 	 * Source: the id came from the logged-in user (identified).
 	 *
 	 * @var string
@@ -72,15 +93,12 @@ final class Resolver {
 	}
 
 	/**
-	 * Extract the distinct id from a posthog-js cookie value.
-	 *
-	 * Handles a missing cookie, a malformed (non-JSON) value, and a value that
-	 * is still URL-encoded. Returns null when no usable distinct id is present.
+	 * Decode a posthog-js cookie value into an associative array.
 	 *
 	 * @param string|null $cookie_value Raw cookie value (may be null).
-	 * @return string|null The distinct id, or null.
+	 * @return array<string,mixed>|null
 	 */
-	public static function parse_distinct_id( $cookie_value ) {
+	public static function decode_cookie( $cookie_value ) {
 		if ( ! is_string( $cookie_value ) || '' === $cookie_value ) {
 			return null;
 		}
@@ -91,7 +109,21 @@ final class Resolver {
 			$decoded = json_decode( rawurldecode( $cookie_value ), true );
 		}
 
-		if ( ! is_array( $decoded ) || ! isset( $decoded['distinct_id'] ) ) {
+		return is_array( $decoded ) ? $decoded : null;
+	}
+
+	/**
+	 * Extract the distinct id from a posthog-js cookie value.
+	 *
+	 * Handles a missing cookie, a malformed (non-JSON) value, and a value that
+	 * is still URL-encoded. Returns null when no usable distinct id is present.
+	 *
+	 * @param string|null $cookie_value Raw cookie value (may be null).
+	 * @return string|null The distinct id, or null.
+	 */
+	public static function parse_distinct_id( $cookie_value ) {
+		$decoded = self::decode_cookie( $cookie_value );
+		if ( null === $decoded || ! isset( $decoded['distinct_id'] ) ) {
 			return null;
 		}
 
@@ -101,6 +133,50 @@ final class Resolver {
 		}
 
 		return $distinct_id;
+	}
+
+	/**
+	 * Extract the browser session id from a posthog-js cookie value when fresh.
+	 *
+	 * @param string|null $cookie_value Raw cookie value (may be null).
+	 * @param int|null    $now_ms       Current epoch time in ms, or null to skip freshness check.
+	 * @return string|null
+	 */
+	public static function parse_session_id( $cookie_value, $now_ms = null ) {
+		$decoded = self::decode_cookie( $cookie_value );
+		if ( null === $decoded || ! isset( $decoded[ self::SESSION_ID_KEY ] ) ) {
+			return null;
+		}
+
+		$sesid = $decoded[ self::SESSION_ID_KEY ];
+		if ( ! is_array( $sesid ) || ! isset( $sesid[1] ) || ! is_string( $sesid[1] ) || '' === $sesid[1] ) {
+			return null;
+		}
+
+		if ( null !== $now_ms ) {
+			$last_activity = isset( $sesid[0] ) && is_numeric( $sesid[0] ) ? (int) $sesid[0] : 0;
+			$session_start = isset( $sesid[2] ) && is_numeric( $sesid[2] ) ? (int) $sesid[2] : 0;
+
+			if ( $last_activity <= 0 || ( $now_ms - $last_activity ) > self::SESSION_MAX_IDLE_MS ) {
+				return null;
+			}
+
+			if ( $session_start > 0 && ( $now_ms - $session_start ) > self::SESSION_MAX_LENGTH_MS ) {
+				return null;
+			}
+		}
+
+		return $sesid[1];
+	}
+
+	/**
+	 * Whether a distinct id belongs to an identified WordPress user.
+	 *
+	 * @param string $distinct_id Distinct id.
+	 * @return bool
+	 */
+	public static function is_user_id( $distinct_id ) {
+		return is_string( $distinct_id ) && 0 === strpos( $distinct_id, self::USER_ID_PREFIX );
 	}
 
 	/**

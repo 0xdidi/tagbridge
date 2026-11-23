@@ -33,11 +33,13 @@ final class Settings {
 			'region'          => Host::REGION_US,
 			'custom_host'     => '',
 			'client'          => array(
-				'autocapture'       => true,
-				'pageviews'         => true,
-				'session_recording' => false,
-				'person_profiles'   => 'identified_only',
-				'cookieless'        => false,
+				'autocapture'        => true,
+				'pageviews'          => true,
+				'heatmaps'           => true,
+				'session_recording'  => false,
+				'capture_exceptions' => false,
+				'person_profiles'    => 'identified_only',
+				'cookieless'         => false,
 			),
 			'identity'        => array(
 				'identify_logged_in' => true,
@@ -214,11 +216,13 @@ final class Settings {
 
 		$client = $current['client'];
 		if ( isset( $input['client'] ) && is_array( $input['client'] ) ) {
-			$raw_client                  = wp_unslash( $input['client'] );
-			$client['autocapture']       = ! empty( $raw_client['autocapture'] );
-			$client['pageviews']         = ! empty( $raw_client['pageviews'] );
-			$client['session_recording'] = ! empty( $raw_client['session_recording'] );
-			$client['cookieless']        = ! empty( $raw_client['cookieless'] );
+			$raw_client                   = wp_unslash( $input['client'] );
+			$client['autocapture']        = ! empty( $raw_client['autocapture'] );
+			$client['pageviews']          = ! empty( $raw_client['pageviews'] );
+			$client['heatmaps']           = ! empty( $raw_client['heatmaps'] );
+			$client['session_recording']  = ! empty( $raw_client['session_recording'] );
+			$client['capture_exceptions'] = ! empty( $raw_client['capture_exceptions'] );
+			$client['cookieless']         = ! empty( $raw_client['cookieless'] );
 
 			$profiles                  = isset( $raw_client['person_profiles'] )
 				? sanitize_text_field( $raw_client['person_profiles'] )

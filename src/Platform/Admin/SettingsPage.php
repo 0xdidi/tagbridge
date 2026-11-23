@@ -126,9 +126,25 @@ final class SettingsPage {
 			'manage_options',
 			self::SLUG,
 			array( $this, 'render' ),
-			'dashicons-randomize',
+			$this->menu_icon(),
 			58
 		);
+	}
+
+	/**
+	 * Data URI for the WordPress admin sidebar icon.
+	 *
+	 * @return string
+	 */
+	private function menu_icon() {
+		$svg = '<svg width="20" height="20" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">'
+			. '<path d="M18 42 C 18 16, 46 16, 46 42" stroke="black" stroke-width="6" stroke-linecap="round" fill="none"/>'
+			. '<circle cx="18" cy="42" r="6" fill="black"/>'
+			. '<circle cx="46" cy="42" r="6" fill="black"/>'
+			. '</svg>';
+
+		// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode
+		return 'data:image/svg+xml;base64,' . base64_encode( $svg );
 	}
 
 	/**

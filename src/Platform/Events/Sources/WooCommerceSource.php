@@ -81,10 +81,27 @@ final class WooCommerceSource {
 		}
 
 		add_action( 'template_redirect', array( $this, 'on_product_view' ) );
-		add_action( 'woocommerce_add_to_cart', array( $this, 'on_add_to_cart' ), 10, 6 );
+		add_action( 'woocommerce_add_to_cart', array( $this, 'on_add_to_cart' ), 10, 5 );
 		add_action( 'woocommerce_checkout_order_processed', array( $this, 'on_checkout' ), 10, 3 );
 		add_action( 'woocommerce_store_api_checkout_order_processed', array( $this, 'on_store_api_checkout' ), 10, 1 );
-		add_action( 'woocommerce_order_status_completed', array( $this, 'on_order_completed' ), 10, 1 );
+		add_action( 'woocommerce_order_status_changed', array( $this, 'on_order_status_changed' ), 10, 4 );
+	}
+
+	/**
+	 * Order statuses that count as a completed/paid purchase.
+	 *
+	 * @return string[]
+	 */
+	public static function purchase_order_statuses() {
+		$defaults = array( 'processing', 'completed' );
+
+		/**
+		 * Filter the WooCommerce order statuses that trigger order_completed.
+		 *
+		 * @param string[] $statuses Status slugs without the wc- prefix.
+		 */
+		$statuses = (array) apply_filters( 'tagbridge_purchase_order_statuses', $defaults );
+		return array_values( array_filter( array_map( 'strval', $statuses ) ) );
 	}
 
 	/**
@@ -102,19 +119,7 @@ final class WooCommerceSource {
 			return;
 		}
 
-		$properties = array(
-			'product_id' => (int) $product->get_id(),
-			'name'       => (string) $product->get_name(),
-			'price'      => (float) $product->get_price(),
-			'currency'   => get_woocommerce_currency(),
-		);
-
-		if ( method_exists( $product, 'get_sku' ) ) {
-			$sku = (string) $product->get_sku();
-			if ( '' !== $sku ) {
-				$properties['sku'] = $sku;
-			}
-		}
+		$properties = $this->product_properties( $product );
 
 		$this->bus->dispatch(
 			new Event(
@@ -134,19 +139,42 @@ final class WooCommerceSource {
 	 * @param string $cart_item_key Cart item key.
 	 * @param int    $product_id    Product id.
 	 * @param int    $quantity      Quantity added.
+	 * @param int    $variation_id  Optional variation id.
+	 * @param array  $variation     Optional variation attributes.
 	 * @return void
 	 */
-	public function on_add_to_cart( $cart_item_key, $product_id, $quantity ) {
-		$product    = wc_get_product( $product_id );
+	public function on_add_to_cart( $cart_item_key, $product_id, $quantity, $variation_id = 0, $variation = array() ) {
+		unset( $cart_item_key, $variation );
+
+		$variation_id = (int) $variation_id;
+		$product      = wc_get_product( $variation_id > 0 ? $variation_id : $product_id );
+		$parent       = $variation_id > 0 ? wc_get_product( $product_id ) : $product;
+
 		$properties = array(
 			'product_id' => (int) $product_id,
-			'name'       => $product ? (string) $product->get_name() : '',
+			'name'       => $parent ? (string) $parent->get_name() : ( $product ? (string) $product->get_name() : '' ),
 			'quantity'   => (int) $quantity,
 			'currency'   => get_woocommerce_currency(),
 		);
 
+		if ( $variation_id > 0 ) {
+			$properties['variation_id'] = $variation_id;
+		}
+
 		if ( $product && method_exists( $product, 'get_price' ) ) {
 			$properties['price'] = (float) $product->get_price();
+		}
+
+		if ( $product && method_exists( $product, 'get_sku' ) ) {
+			$sku = (string) $product->get_sku();
+			if ( '' !== $sku ) {
+				$properties['sku'] = $sku;
+			}
+		}
+
+		$category = $this->primary_category( (int) $product_id );
+		if ( '' !== $category ) {
+			$properties['category'] = $category;
 		}
 
 		$this->bus->dispatch(
@@ -252,17 +280,38 @@ final class WooCommerceSource {
 	}
 
 	/**
+	 * Trigger order_completed when an order transitions to a paid status.
+	 *
+	 * @param int         $order_id    Order id.
+	 * @param string      $from_status Previous status slug.
+	 * @param string      $to_status   New status slug.
+	 * @param object|null $order       Optional WC_Order instance.
+	 * @return void
+	 */
+	public function on_order_status_changed( $order_id, $from_status, $to_status, $order = null ) {
+		unset( $from_status );
+		if ( ! in_array( (string) $to_status, self::purchase_order_statuses(), true ) ) {
+			return;
+		}
+
+		$this->on_order_completed( $order_id, $order );
+	}
+
+	/**
 	 * Capture a completed order once (idempotent across repeated status transitions).
 	 *
 	 * Evaluates exclusion against the order/customer snapshot rather than the
 	 * active admin session so an administrator marking a customer order complete
 	 * still tracks the customer's revenue when appropriate.
 	 *
-	 * @param int $order_id Order id.
+	 * @param int         $order_id Order id.
+	 * @param object|null $order    Optional WC_Order instance.
 	 * @return void
 	 */
-	public function on_order_completed( $order_id ) {
-		$order = wc_get_order( $order_id );
+	public function on_order_completed( $order_id, $order = null ) {
+		if ( ! is_object( $order ) || ! method_exists( $order, 'get_id' ) ) {
+			$order = wc_get_order( $order_id );
+		}
 		if ( ! is_object( $order ) || ! method_exists( $order, 'get_id' ) ) {
 			return;
 		}
@@ -313,11 +362,122 @@ final class WooCommerceSource {
 	 * @return array<string,mixed>
 	 */
 	private function order_properties( $order ) {
-		return array(
+		$total = (float) $order->get_total();
+
+		$properties = array(
 			'order_id'   => (int) $order->get_id(),
-			'value'      => (float) $order->get_total(),
+			'value'      => $total,
+			'revenue'    => $total,
 			'currency'   => (string) $order->get_currency(),
 			'item_count' => (int) $order->get_item_count(),
 		);
+
+		if ( method_exists( $order, 'get_shipping_total' ) ) {
+			$properties['shipping'] = (float) $order->get_shipping_total();
+		}
+
+		if ( method_exists( $order, 'get_total_tax' ) ) {
+			$properties['tax'] = (float) $order->get_total_tax();
+		}
+
+		if ( method_exists( $order, 'get_discount_total' ) ) {
+			$properties['discount'] = (float) $order->get_discount_total();
+		}
+
+		if ( method_exists( $order, 'get_coupon_codes' ) ) {
+			$coupons = array_filter( array_map( 'strval', (array) $order->get_coupon_codes() ) );
+			if ( ! empty( $coupons ) ) {
+				$properties['coupon'] = implode( ', ', $coupons );
+			}
+		}
+
+		if ( method_exists( $order, 'get_items' ) ) {
+			$products = array();
+			foreach ( (array) $order->get_items() as $item ) {
+				if ( ! is_object( $item ) || ! method_exists( $item, 'get_product_id' ) ) {
+					continue;
+				}
+				$pid      = (int) $item->get_product_id();
+				$qty      = method_exists( $item, 'get_quantity' ) ? max( 1, (int) $item->get_quantity() ) : 1;
+				$line_tot = method_exists( $item, 'get_total' ) ? (float) $item->get_total() : 0.0;
+				$product  = method_exists( $item, 'get_product' ) ? $item->get_product() : null;
+
+				$entry = array(
+					'product_id' => $pid,
+					'name'       => method_exists( $item, 'get_name' ) ? (string) $item->get_name() : '',
+					'quantity'   => $qty,
+					'price'      => round( $line_tot / $qty, 2 ),
+				);
+
+				if ( $product && method_exists( $product, 'get_sku' ) ) {
+					$sku = (string) $product->get_sku();
+					if ( '' !== $sku ) {
+						$entry['sku'] = $sku;
+					}
+				}
+
+				$category = $this->primary_category( $pid );
+				if ( '' !== $category ) {
+					$entry['category'] = $category;
+				}
+
+				$products[] = $entry;
+			}
+			if ( ! empty( $products ) ) {
+				$properties['products'] = $products;
+			}
+		}
+
+		return $properties;
+	}
+
+	/**
+	 * Build normalized properties for a product object.
+	 *
+	 * @param object $product WC_Product instance.
+	 * @return array<string,mixed>
+	 */
+	private function product_properties( $product ) {
+		$product_id = (int) $product->get_id();
+		$properties = array(
+			'product_id' => $product_id,
+			'name'       => (string) $product->get_name(),
+			'price'      => (float) $product->get_price(),
+			'currency'   => get_woocommerce_currency(),
+		);
+
+		if ( method_exists( $product, 'get_sku' ) ) {
+			$sku = (string) $product->get_sku();
+			if ( '' !== $sku ) {
+				$properties['sku'] = $sku;
+			}
+		}
+
+		$category = $this->primary_category( $product_id );
+		if ( '' !== $category ) {
+			$properties['category'] = $category;
+		}
+
+		return $properties;
+	}
+
+	/**
+	 * Primary product category name, or '' if unavailable.
+	 *
+	 * @param int $product_id Product id.
+	 * @return string
+	 */
+	private function primary_category( $product_id ) {
+		if ( $product_id <= 0 || ! function_exists( 'get_the_terms' ) ) {
+			return '';
+		}
+
+		$terms = get_the_terms( $product_id, 'product_cat' );
+		if ( ! is_array( $terms ) || empty( $terms ) ) {
+			return '';
+		}
+
+		$first = reset( $terms );
+		return ( is_object( $first ) && isset( $first->name ) ) ? (string) $first->name : '';
 	}
 }

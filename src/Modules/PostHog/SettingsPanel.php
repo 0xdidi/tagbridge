@@ -107,7 +107,7 @@ final class SettingsPanel {
 							placeholder="phc_..."
 						/>
 						<p class="tagbridge-help tagbridge-help--field">
-							<?php esc_html_e( 'Find this in PostHog under Settings, Project, Project API key. It is safe to expose in the browser.', 'tagbridge' ); ?>
+							<?php esc_html_e( 'Find this in PostHog under Settings, Project, Project token (or Project API key). It is safe to expose in the browser.', 'tagbridge' ); ?>
 						</p>
 					</div>
 
@@ -166,10 +166,24 @@ final class SettingsPanel {
 					);
 					$this->row(
 						'client',
+						'heatmaps',
+						__( 'Capture heatmaps', 'tagbridge' ),
+						__( 'Collect click and scroll heatmap data when enabled in PostHog.', 'tagbridge' ),
+						! empty( $client['heatmaps'] )
+					);
+					$this->row(
+						'client',
 						'session_recording',
 						__( 'Record sessions', 'tagbridge' ),
-						__( 'Session replays. Heavier, so off by default.', 'tagbridge' ),
+						__( 'Session replays with form inputs and customer details masked.', 'tagbridge' ),
 						! empty( $client['session_recording'] )
+					);
+					$this->row(
+						'client',
+						'capture_exceptions',
+						__( 'Capture JavaScript errors', 'tagbridge' ),
+						__( 'Send unhandled browser exceptions to PostHog error tracking.', 'tagbridge' ),
+						! empty( $client['capture_exceptions'] )
 					);
 					$this->row(
 						'client',
