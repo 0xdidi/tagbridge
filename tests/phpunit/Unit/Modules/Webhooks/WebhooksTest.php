@@ -113,16 +113,28 @@ final class WebhooksTest extends TestCase {
 	}
 
 	public function test_module_before_save_validates_url() {
+		Functions\when( 'get_option' )->justReturn( array() );
 		Functions\when( 'wp_parse_url' )->alias( 'parse_url' );
+		Functions\when( 'esc_url_raw' )->alias(
+			static function ( $url, $protocols = null ) {
+				$scheme = wp_parse_url( (string) $url, PHP_URL_SCHEME );
+				if ( is_array( $protocols ) && ! in_array( $scheme, $protocols, true ) ) {
+					return '';
+				}
+				return (string) $url;
+			}
+		);
 		$module = new Module();
 
-		$bad = $module->before_save( array( 'endpoint_url' => 'ftp://invalid.example.com' ) );
+		$sanitized_bad = $module->sanitize( array( 'endpoint_url' => 'ftp://invalid.example.com' ) );
+		$bad           = $module->before_save( $sanitized_bad );
 		$this->assertFalse( $bad['ok'] );
 
-		$good = $module->before_save( array( 'endpoint_url' => 'https://hooks.example.com/path' ) );
+		$sanitized_good = $module->sanitize( array( 'endpoint_url' => 'https://hooks.example.com/path' ) );
+		$good           = $module->before_save( $sanitized_good );
 		$this->assertTrue( $good['ok'] );
 
-		$empty = $module->before_save( array( 'endpoint_url' => '' ) );
+		$empty = $module->before_save( $module->sanitize( array( 'endpoint_url' => '' ) ) );
 		$this->assertTrue( $empty['ok'] );
 	}
 }

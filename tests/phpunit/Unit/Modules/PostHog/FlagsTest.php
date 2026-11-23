@@ -104,4 +104,8 @@ final class FlagsTest extends TestCase {
 		$this->assertFalse( $client->get_feature_flag( 'my-flag', 'wp_123', false ) );
 		$this->assertSame( 'control', $client->get_feature_flag( 'my-flag', 'wp_123', 'control' ) );
 	}
+
+	public function test_sanitize_flag_key_preserves_case() {
+		$this->assertSame( 'NewHero_Banner-2', Evaluator::sanitize_flag_key( 'NewHero_Banner-2!@#' ) );
+	}
 }

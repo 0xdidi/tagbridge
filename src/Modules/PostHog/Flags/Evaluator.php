@@ -35,6 +35,16 @@ final class Evaluator {
 	}
 
 	/**
+	 * Sanitize a PostHog feature flag key while preserving case.
+	 *
+	 * @param string $flag_key Raw feature flag key.
+	 * @return string
+	 */
+	public static function sanitize_flag_key( $flag_key ) {
+		return (string) preg_replace( '/[^A-Za-z0-9_\-]/', '', (string) $flag_key );
+	}
+
+	/**
 	 * Evaluate a feature flag for the current visitor.
 	 *
 	 * @param string      $flag_key Feature flag key.
@@ -42,7 +52,7 @@ final class Evaluator {
 	 * @return bool|string
 	 */
 	public static function evaluate( $flag_key, $fallback = false ) {
-		$flag_key = sanitize_key( (string) $flag_key );
+		$flag_key = self::sanitize_flag_key( $flag_key );
 		if ( '' === $flag_key || ! Settings::is_configured() ) {
 			return $fallback;
 		}

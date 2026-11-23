@@ -129,8 +129,13 @@ final class Settings {
 		$current = self::all();
 
 		if ( isset( $input['endpoint_url'] ) ) {
-			$url                     = trim( esc_url_raw( wp_unslash( $input['endpoint_url'] ), array( 'http', 'https' ) ) );
-			$current['endpoint_url'] = $url;
+			$raw = trim( sanitize_text_field( wp_unslash( $input['endpoint_url'] ) ) );
+			if ( '' === $raw ) {
+				$current['endpoint_url'] = '';
+			} else {
+				$escaped                 = esc_url_raw( $raw, array( 'http', 'https' ) );
+				$current['endpoint_url'] = '' !== $escaped ? $escaped : $raw;
+			}
 		}
 
 		if ( isset( $input['secret'] ) ) {

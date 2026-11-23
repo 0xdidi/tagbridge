@@ -40,6 +40,10 @@ final class FeatureFlagBlock {
 			true
 		);
 
+		if ( function_exists( 'wp_set_script_translations' ) ) {
+			wp_set_script_translations( 'tagbridge-feature-flag-block', 'tagbridge' );
+		}
+
 		register_block_type(
 			'tagbridge/feature-flag',
 			array(

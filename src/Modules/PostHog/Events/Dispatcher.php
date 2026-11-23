@@ -83,12 +83,23 @@ final class Dispatcher {
 			return;
 		}
 
-		$properties = $this->with_request_context( $properties );
-		$properties = $this->with_person_profile_mode( (string) $distinct_id, $properties );
+		$properties = $this->prepare_properties( (string) $distinct_id, $properties );
 
 		if ( ! $client->capture( $distinct_id, $events[ $event_key ], $properties ) ) {
 			$this->log( 'capture ' . $event_key . ' failed: ' . $client->last_error() );
 		}
+	}
+
+	/**
+	 * Enrich event properties with request context and person-profile mode.
+	 *
+	 * @param string              $distinct_id Resolved distinct id.
+	 * @param array<string,mixed> $properties  Base event properties.
+	 * @return array<string,mixed>
+	 */
+	public function prepare_properties( $distinct_id, array $properties ) {
+		$properties = $this->with_request_context( $properties );
+		return $this->with_person_profile_mode( (string) $distinct_id, $properties );
 	}
 
 	/**
