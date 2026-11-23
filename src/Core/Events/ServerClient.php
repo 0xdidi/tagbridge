@@ -167,6 +167,28 @@ final class ServerClient {
 	}
 
 	/**
+	 * Evaluate a feature flag for a distinct id, returning $fallback on failure.
+	 *
+	 * @param string      $key         Feature flag key.
+	 * @param string      $distinct_id Distinct id.
+	 * @param bool|string $fallback    Fallback value.
+	 * @return bool|string
+	 */
+	public function get_feature_flag( $key, $distinct_id, $fallback = false ) {
+		if ( ! $this->guard( $distinct_id ) || '' === (string) $key ) {
+			return $fallback;
+		}
+
+		try {
+			$value = PostHog::getFeatureFlag( (string) $key, (string) $distinct_id );
+			return null === $value ? $fallback : $value;
+		} catch ( \Throwable $e ) {
+			$this->last_error = $e->getMessage();
+			return $fallback;
+		}
+	}
+
+	/**
 	 * The last error message, if any.
 	 *
 	 * @return string
