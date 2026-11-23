@@ -4,7 +4,7 @@ Tags: analytics, posthog, tracking, events, statistics
 Requires at least: 5.8
 Tested up to: 7.0
 Requires PHP: 8.2
-Stable tag: 0.4.1
+Stable tag: 0.4.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -102,6 +102,10 @@ Global controls under **Privacy & Settings** apply across all integrations:
 
 == Changelog ==
 
+= 0.4.2 =
+* Fixed WordPress admin sidebar SVG icon tinting by switching to a pure filled path with transparent interior.
+* Fixed admin notice placement on Tagbridge screens (`wp-header-end` anchor) and hid single-module launch notices while viewing that module's settings page.
+
 = 0.4.1 =
 * Fixed "Send test webhook" and "Send test event" buttons so they submit standalone forms to their diagnostic handlers instead of triggering settings save.
 * Made PostHog browser consent bootstrapping unconditionally cache-safe in both "Require consent" and "Cookieless until consent" modes.
@@ -136,6 +140,9 @@ Global controls under **Privacy & Settings** apply across all integrations:
 * First release: connect to PostHog (US, EU, or self-hosted / reverse proxy), validate the key before saving, and load PostHog on the front end with tracking toggles (pageviews, autocapture, session recording, person profiles, cookieless mode).
 
 == Upgrade Notice ==
+
+= 0.4.2 =
+Fixes WordPress admin sidebar icon tinting and admin notice placement on Tagbridge screens.
 
 = 0.4.1 =
 Fixes test webhook/event form submission, makes browser consent gating unconditionally cache-safe, fixes invalid webhook URL validation, preserves feature flag key case, and refreshes translation strings.
