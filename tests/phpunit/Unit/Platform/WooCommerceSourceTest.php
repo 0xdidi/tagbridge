@@ -301,4 +301,119 @@ final class WooCommerceSourceTest extends TestCase {
 		$this->assertCount( 1, $events );
 		$this->assertSame( 301, $events[0]->context( 'order_id' ) );
 	}
+
+	public function test_paid_status_triggers_order_completed_once_with_enriched_properties() {
+		Functions\when( 'get_option' )->justReturn( array() );
+		Functions\when( 'is_user_logged_in' )->justReturn( false );
+		Functions\when( 'wp_has_consent' )->justReturn( true );
+		Functions\when( 'get_the_terms' )->justReturn( array( (object) array( 'name' => 'Apparel' ) ) );
+
+		$rich_order = new class() {
+			/**
+			 * Order metadata.
+			 *
+			 * @var array<string,mixed>
+			 */
+			public $meta = array();
+
+			public function get_id() {
+				return 401;
+			}
+
+			public function get_customer_id() {
+				return 0;
+			}
+
+			public function get_total() {
+				return 115.00;
+			}
+
+			public function get_currency() {
+				return 'EUR';
+			}
+
+			public function get_item_count() {
+				return 2;
+			}
+
+			public function get_shipping_total() {
+				return 10.00;
+			}
+
+			public function get_total_tax() {
+				return 15.00;
+			}
+
+			public function get_discount_total() {
+				return 10.00;
+			}
+
+			public function get_coupon_codes() {
+				return array( 'SAVE10' );
+			}
+
+			public function get_items() {
+				return array(
+					new class() {
+						public function get_product_id() {
+							return 12;
+						}
+
+						public function get_name() {
+							return 'Hoodie';
+						}
+
+						public function get_quantity() {
+							return 2;
+						}
+
+						public function get_total() {
+							return 100.00;
+						}
+
+						public function get_product() {
+							return new class() {
+								public function get_sku() {
+									return 'HD-01';
+								}
+							};
+						}
+					},
+				);
+			}
+
+			public function get_meta( $key ) {
+				return isset( $this->meta[ $key ] ) ? $this->meta[ $key ] : '';
+			}
+
+			public function update_meta_data( $key, $value ) {
+				$this->meta[ $key ] = $value;
+			}
+
+			public function save() {
+			}
+		};
+
+		$events = array();
+		$bus    = new EventBus();
+		$bus->subscribe( $this->make_collector( ConsentCategory::STATISTICS, $events ) );
+
+		$source = new WooCommerceSource( $bus );
+		$source->on_order_status_changed( 401, 'checkout-draft', 'pending', $rich_order );
+		$source->on_order_status_changed( 401, 'pending', 'processing', $rich_order );
+		$source->on_order_status_changed( 401, 'processing', 'completed', $rich_order );
+
+		$this->assertCount( 1, $events );
+		$props = $events[0]->properties();
+		$this->assertSame( 115.0, $props['value'] );
+		$this->assertSame( 115.0, $props['revenue'] );
+		$this->assertSame( 10.0, $props['shipping'] );
+		$this->assertSame( 15.0, $props['tax'] );
+		$this->assertSame( 10.0, $props['discount'] );
+		$this->assertSame( 'SAVE10', $props['coupon'] );
+		$this->assertCount( 1, $props['products'] );
+		$this->assertSame( 'HD-01', $props['products'][0]['sku'] );
+		$this->assertSame( 'Apparel', $props['products'][0]['category'] );
+		$this->assertSame( 50.0, $props['products'][0]['price'] );
+	}
 }
