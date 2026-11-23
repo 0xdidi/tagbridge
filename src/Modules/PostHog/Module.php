@@ -10,6 +10,7 @@ namespace Tagbridge\Modules\PostHog;
 use Tagbridge\Core\Connection\Host;
 use Tagbridge\Core\Events\Event;
 use Tagbridge\Core\Events\Schema;
+use Tagbridge\Core\Events\ServerClient;
 use Tagbridge\Core\Privacy\ConsentCategory;
 use Tagbridge\Modules\PostHog\Connection\Validator;
 use Tagbridge\Modules\PostHog\Events\Dispatcher;
@@ -35,6 +36,27 @@ final class Module implements ConfigurableModule, EventSubscriberInterface {
 	 * @var string
 	 */
 	const ORDER_DISTINCT_ID_META = '_tagbridge_distinct_id';
+
+	/**
+	 * Admin-post action for sending a PostHog diagnostic test event.
+	 *
+	 * @var string
+	 */
+	const ACTION_TEST_EVENT = 'tagbridge_posthog_test_event';
+
+	/**
+	 * Nonce action/field for the PostHog diagnostic test event.
+	 *
+	 * @var string
+	 */
+	const NONCE_TEST_EVENT = 'tagbridge_posthog_test_event';
+
+	/**
+	 * Transient storing the latest diagnostic check result.
+	 *
+	 * @var string
+	 */
+	const LAST_DIAG_TRANSIENT = 'tagbridge_posthog_last_diag';
 
 	/**
 	 * Lazy server-side event dispatcher.
@@ -106,6 +128,64 @@ final class Module implements ConfigurableModule, EventSubscriberInterface {
 		( new Enqueue() )->register();
 
 		add_filter( 'tagbridge_order_checkout_meta', array( $this, 'capture_order_distinct_id' ), 10, 2 );
+		add_action( 'admin_post_' . self::ACTION_TEST_EVENT, array( $this, 'handle_test_event' ) );
+	}
+
+	/**
+	 * Send a clearly labeled diagnostic test event and verify PostHog reachability.
+	 *
+	 * @return void
+	 */
+	public function handle_test_event() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( 'You do not have permission to do that.', 'tagbridge' ), 403 );
+		}
+
+		check_admin_referer( self::NONCE_TEST_EVENT, 'tagbridge_posthog_test_nonce' );
+
+		$key   = Settings::project_api_key();
+		$host  = Settings::host();
+		$check = Validator::check( $key, $host );
+
+		if ( empty( $check['ok'] ) ) {
+			$result = array(
+				'ok'        => false,
+				'message'   => $check['message'],
+				'timestamp' => time(),
+			);
+		} else {
+			$client = new ServerClient();
+			$sent   = $client->init( $key, $host ) && $client->capture(
+				'tagbridge_diagnostic_check',
+				'tagbridge_test_event',
+				array(
+					'$process_person_profile' => false,
+					'$insert_id'              => wp_generate_uuid4(),
+					'site_url'                => home_url(),
+				)
+			) && $client->flush();
+
+			$result = array(
+				'ok'        => $sent,
+				'message'   => $sent
+					? __( 'Reachable. Sent tagbridge_test_event to your PostHog project.', 'tagbridge' )
+					: __( 'Key verified, but sending tagbridge_test_event failed.', 'tagbridge' ),
+				'timestamp' => time(),
+			);
+		}
+
+		set_transient( self::LAST_DIAG_TRANSIENT, $result, DAY_IN_SECONDS );
+		set_transient(
+			'tagbridge_flash_' . get_current_user_id(),
+			array(
+				'type'    => $result['ok'] ? 'success' : 'error',
+				'message' => $result['message'],
+			),
+			60
+		);
+
+		wp_safe_redirect( admin_url( 'admin.php?page=tagbridge&module=' . self::ID ) );
+		exit;
 	}
 
 	/**

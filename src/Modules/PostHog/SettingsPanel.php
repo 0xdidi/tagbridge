@@ -9,6 +9,7 @@ namespace Tagbridge\Modules\PostHog;
 
 use Tagbridge\Core\Connection\Host;
 use Tagbridge\Platform\Events\Sources\WooCommerceSource;
+use Tagbridge\Platform\Settings\Options;
 
 /**
  * Renders the PostHog module's settings UI.
@@ -38,10 +39,11 @@ final class SettingsPanel {
 	 */
 	public function tabs() {
 		return array(
-			'connection' => __( 'Connection', 'tagbridge' ),
-			'tracking'   => __( 'Tracking', 'tagbridge' ),
-			'identity'   => __( 'Identity', 'tagbridge' ),
-			'server'     => __( 'Server events', 'tagbridge' ),
+			'connection'  => __( 'Connection', 'tagbridge' ),
+			'tracking'    => __( 'Tracking', 'tagbridge' ),
+			'identity'    => __( 'Identity', 'tagbridge' ),
+			'server'      => __( 'Server events', 'tagbridge' ),
+			'diagnostics' => __( 'Diagnostics', 'tagbridge' ),
 		);
 	}
 
@@ -325,6 +327,70 @@ final class SettingsPanel {
 						<?php
 					}
 					?>
+				</div>
+			</section>
+		</div>
+
+		<div class="tagbridge-panel" id="tagbridge-panel-<?php echo esc_attr( $this->id ); ?>-diagnostics" role="tabpanel" aria-labelledby="tagbridge-tab-<?php echo esc_attr( $this->id ); ?>-diagnostics" tabindex="0" hidden>
+			<?php
+			$enabled     = Options::is_module_enabled( $this->id );
+			$last_diag   = function_exists( 'get_transient' ) ? get_transient( Module::LAST_DIAG_TRANSIENT ) : null;
+			$host        = Settings::host();
+			$assets_host = str_replace( '.i.posthog.com', '-assets.i.posthog.com', $host );
+			?>
+			<section class="tagbridge-card">
+				<div class="tagbridge-card__head">
+					<h2 class="tagbridge-card__title"><?php esc_html_e( 'Live check & test event', 'tagbridge' ); ?></h2>
+					<?php if ( is_array( $last_diag ) && ! empty( $last_diag['message'] ) ) : ?>
+						<span class="tagbridge-status <?php echo ! empty( $last_diag['ok'] ) ? 'tagbridge-status--ok' : ''; ?>">
+							<?php echo esc_html( $last_diag['message'] ); ?>
+						</span>
+					<?php endif; ?>
+				</div>
+				<div class="tagbridge-card__body">
+					<p class="tagbridge-help">
+						<?php esc_html_e( 'Verify PostHog host reachability and send a clearly labeled tagbridge_test_event (without creating a person profile).', 'tagbridge' ); ?>
+					</p>
+					<?php wp_nonce_field( Module::NONCE_TEST_EVENT, 'tagbridge_posthog_test_nonce' ); ?>
+					<button
+						type="submit"
+						class="button button-secondary tagbridge-btn-secondary"
+						formaction="<?php echo esc_url( admin_url( 'admin-post.php?action=' . Module::ACTION_TEST_EVENT ) ); ?>"
+						<?php disabled( ! ( $connected && $enabled ) ); ?>
+					>
+						<?php esc_html_e( 'Send test event', 'tagbridge' ); ?>
+					</button>
+					<?php if ( ! $connected || ! $enabled ) : ?>
+						<p class="tagbridge-help tagbridge-help--field">
+							<?php esc_html_e( 'Enable PostHog and save your project API key before sending a test event.', 'tagbridge' ); ?>
+						</p>
+					<?php endif; ?>
+				</div>
+			</section>
+
+			<section class="tagbridge-card">
+				<div class="tagbridge-card__head">
+					<h2 class="tagbridge-card__title"><?php esc_html_e( 'Troubleshooting', 'tagbridge' ); ?></h2>
+				</div>
+				<div class="tagbridge-card__body">
+					<p class="tagbridge-help">
+						<?php
+						echo esc_html(
+							sprintf(
+								/* translators: 1: script host, 2: ingestion host. */
+								__( 'Content Security Policy (CSP): allow %1$s in script-src and %2$s in connect-src if your site enforces strict CSP headers.', 'tagbridge' ),
+								'' !== $assets_host ? $assets_host : 'https://us-assets.i.posthog.com',
+								'' !== $host ? $host : 'https://us.i.posthog.com'
+							)
+						);
+						?>
+					</p>
+					<p class="tagbridge-help">
+						<?php esc_html_e( 'Duplicate snippets: if another theme or tag manager already calls posthog.init(), remove the duplicate snippet so pageviews and identities are not split.', 'tagbridge' ); ?>
+					</p>
+					<p class="tagbridge-help">
+						<?php esc_html_e( 'Feature flags: use the PostHog Feature Flag block or [tagbridge_flag key="my-flag"]content[/tagbridge_flag] shortcode. Full-page caches may serve one variant to anonymous visitors unless bypassed.', 'tagbridge' ); ?>
+					</p>
 				</div>
 			</section>
 		</div>
