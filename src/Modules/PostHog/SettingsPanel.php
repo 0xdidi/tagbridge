@@ -351,15 +351,23 @@ final class SettingsPanel {
 					<p class="tagbridge-help">
 						<?php esc_html_e( 'Verify PostHog host reachability and send a clearly labeled tagbridge_test_event (without creating a person profile).', 'tagbridge' ); ?>
 					</p>
-					<?php wp_nonce_field( Module::NONCE_TEST_EVENT, 'tagbridge_posthog_test_nonce' ); ?>
 					<button
 						type="submit"
 						class="button button-secondary tagbridge-btn-secondary"
-						formaction="<?php echo esc_url( admin_url( 'admin-post.php?action=' . Module::ACTION_TEST_EVENT ) ); ?>"
+						form="tagbridge-posthog-test-form"
+						formnovalidate
 						<?php disabled( ! ( $connected && $enabled ) ); ?>
 					>
 						<?php esc_html_e( 'Send test event', 'tagbridge' ); ?>
 					</button>
+					<?php
+					add_action(
+						'tagbridge_after_module_form',
+						array( $this, 'render_test_form' ),
+						10,
+						1
+					);
+					?>
 					<?php if ( ! $connected || ! $enabled ) : ?>
 						<p class="tagbridge-help tagbridge-help--field">
 							<?php esc_html_e( 'Enable PostHog and save your project API key before sending a test event.', 'tagbridge' ); ?>
@@ -394,6 +402,24 @@ final class SettingsPanel {
 				</div>
 			</section>
 		</div>
+		<?php
+	}
+
+	/**
+	 * Render the standalone test-event form outside the main settings form.
+	 *
+	 * @param string $module_id Rendered module id.
+	 * @return void
+	 */
+	public function render_test_form( $module_id ) {
+		if ( $this->id !== $module_id ) {
+			return;
+		}
+		?>
+		<form id="tagbridge-posthog-test-form" method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" hidden>
+			<input type="hidden" name="action" value="<?php echo esc_attr( Module::ACTION_TEST_EVENT ); ?>" />
+			<?php wp_nonce_field( Module::NONCE_TEST_EVENT, 'tagbridge_posthog_test_nonce' ); ?>
+		</form>
 		<?php
 	}
 
