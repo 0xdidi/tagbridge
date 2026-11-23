@@ -4,7 +4,7 @@ Tags: analytics, posthog, tracking, events, statistics
 Requires at least: 5.8
 Tested up to: 7.0
 Requires PHP: 8.2
-Stable tag: 0.3.0
+Stable tag: 0.4.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -21,17 +21,19 @@ Tagbridge is an independent project. It is not affiliated with, endorsed by, or 
 * **Modular Integrations Hub:** Enable or disable integrations at any time with zero runtime cost when disabled. Each integration has its own isolated settings screen, plus a **Coming soon** catalog with local in-WordPress launch notifications (**Notify me**).
 * **Global Privacy & Settings:** Built-in WordPress Consent API integration (`Off`, `Require consent`, or `Cookieless until consent`), Do Not Track (`DNT`) header support, and WordPress role exclusions applied across both browser scripts and server-side events.
 * **PostHog Connection & Key Check:** Connect to PostHog Cloud (US or EU) or your own self-hosted or reverse-proxy host. Your project API key is checked with a live read-only test call before it is saved.
-* **Client-side Tracking:** Loads PostHog (`posthog-js`) from the host you configure with toggles for pageviews, autocapture (clicks and form interactions), session recording, person profile mode, and privacy-first cookieless mode.
-* **Identity Stitching:** Tie logged-in WordPress users to one PostHog person across anonymous and logged-in sessions using a stable hashed identifier (never the raw user ID), with per-property controls (email, name, role).
+* **Client-side Tracking:** Loads PostHog (`posthog-js`) from the host you configure with toggles for pageviews, autocapture, heatmaps, session recording (with input and WooCommerce customer detail masking), optional JavaScript error capture, person profile mode, and cookieless mode.
+* **Diagnostics & Feature Flags:** Verify PostHog reachability with a labeled `tagbridge_test_event` check, and gate content server-side with the PostHog Feature Flag Gutenberg block or `[tagbridge_flag]` shortcode.
+* **Webhooks:** Send normalized, HMAC-SHA256 signed JSON event payloads (`X-Tagbridge-Signature`) for WordPress and WooCommerce events to Zapier, Make, n8n, or any HTTPS endpoint, with per-event switches and a live test delivery button.
+* **Identity Stitching:** Tie logged-in users to one PostHog person across anonymous and logged-in sessions using a stable hashed identifier (never the raw user ID), with automatic browser reset on logout and server `$session_id` / proxy IP / user-agent enrichment.
 * **Server-side Events:** Capture key events (`user_logged_in`, `user_registered`) directly from WordPress so they still arrive when browsers block tracking, with non-blocking shutdown delivery and per-event switches.
-* **WooCommerce Events (when active):** HPOS-safe tracking for classic and Block Checkout (`product_viewed`, `product_added_to_cart`, `checkout_started`, `order_completed` with value and currency), idempotent order completion (never double-counted on repeated status changes), and customer-safe privacy snapshots when admins complete orders.
+* **WooCommerce Events (when active):** HPOS-safe tracking for classic and Block Checkout (`product_viewed`, `product_added_to_cart`, `checkout_started`, `order_completed` across paid statuses with `revenue`, `shipping`, `tax`, `discount`, `coupon`, and `products[]`), idempotent order completion, and customer-safe privacy snapshots.
 
 = On the roadmap =
 
 Planned for future releases:
 
-* **Upcoming Integrations:** Webhooks, Google Analytics 4, Meta Pixel & Conversions API, Klaviyo, Microsoft Clarity, Plausible Analytics, Intercom, and Slack & Discord Alerts.
-* **PostHog Deepening:** Setup diagnostics with a labeled test-event check, a no-flicker server-evaluated feature-flag Gutenberg block and shortcode, and starter dashboards provisioned in your PostHog project.
+* **Upcoming Integrations:** Google Analytics 4, Meta Pixel & Conversions API, Klaviyo, Microsoft Clarity, Plausible Analytics, Intercom, and Slack & Discord Alerts.
+* **PostHog Deepening:** Starter dashboards provisioned in your PostHog project.
 
 == Installation ==
 
@@ -100,6 +102,13 @@ Global controls under **Privacy & Settings** apply across all integrations:
 
 == Changelog ==
 
+= 0.4.0 =
+* Webhooks integration: send normalized JSON payloads with optional HMAC-SHA256 signing (`X-Tagbridge-Signature`), per-event toggles, delivery status, and a Send test webhook button.
+* PostHog Diagnostics & Feature Flags: added Diagnostics tab with live `tagbridge_test_event` check and CSP/duplicate-snippet guidance, plus server-evaluated `tagbridge/feature-flag` Gutenberg block and `[tagbridge_flag]` shortcode.
+* PostHog conformance & privacy: honor `person_profiles: identified_only` on server events (`$process_person_profile => false`), link server events to Session Replay via `$session_id`, reset browser identity on logout, stop generating random UUIDs for cookieless server events, add cache-safe browser consent checks, and register the PostHog cookie via `wp_add_cookie_info()`.
+* PostHog tracking & WooCommerce enrichment: added `capture_heatmaps`, optional `capture_exceptions`, session-replay PII masking, proxy-safe `$ip` and `$raw_user_agent` context, paid-status `order_completed` trigger, and enriched ecommerce properties (`revenue`, `shipping`, `tax`, `discount`, `coupon`, `category`, `sku`, `products[]`).
+* Replaced the generic WordPress admin sidebar icon with the Tagbridge mark.
+
 = 0.3.0 =
 * Integrations Hub: dedicated catalog screen with instant per-integration enable/disable (zero validation overhead on toggle), isolated per-module detail views, and a Coming soon catalog with local in-WordPress launch notifications ("Notify me").
 * Global Privacy & Settings: WordPress Consent API integration (`Off`, `Require consent`, `Cookieless until consent`), Do Not Track (DNT) support, and role exclusions across browser and server-side tracking.
@@ -121,6 +130,9 @@ Global controls under **Privacy & Settings** apply across all integrations:
 * First release: connect to PostHog (US, EU, or self-hosted / reverse proxy), validate the key before saving, and load PostHog on the front end with tracking toggles (pageviews, autocapture, session recording, person profiles, cookieless mode).
 
 == Upgrade Notice ==
+
+= 0.4.0 =
+Adds the Webhooks integration, PostHog Diagnostics and server-evaluated Feature Flag block/shortcode, cache-safe consent checks, server-side person profile and session replay conformance, and enriched WooCommerce order tracking.
 
 = 0.3.0 =
 Adds the modular Integrations Hub, Coming soon launch alerts, global WordPress Consent API & role exclusions, WooCommerce Block Checkout support, and idempotent order completion tracking.
