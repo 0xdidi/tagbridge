@@ -108,4 +108,24 @@ final class ResolverTest extends TestCase {
 	public function test_person_properties_empty_input_returns_empty() {
 		$this->assertSame( array(), Resolver::person_properties( array() ) );
 	}
+
+	public function test_parse_session_id_extracts_fresh_session() {
+		$now    = 1700000000000;
+		$cookie = rawurlencode( '{"distinct_id":"abc","$sesid":[' . ( $now - 60000 ) . ',"0190-sess",' . ( $now - 120000 ) . ']}' );
+		$this->assertSame( '0190-sess', Resolver::parse_session_id( $cookie, $now ) );
+	}
+
+	public function test_parse_session_id_returns_null_when_idle_or_expired() {
+		$now       = 1700000000000;
+		$idle_cook = '{"$sesid":[' . ( $now - Resolver::SESSION_MAX_IDLE_MS - 1000 ) . ',"0190-idle",' . ( $now - Resolver::SESSION_MAX_IDLE_MS - 2000 ) . ']}';
+		$old_cook  = '{"$sesid":[' . ( $now - 1000 ) . ',"0190-old",' . ( $now - Resolver::SESSION_MAX_LENGTH_MS - 1000 ) . ']}';
+		$this->assertNull( Resolver::parse_session_id( $idle_cook, $now ) );
+		$this->assertNull( Resolver::parse_session_id( $old_cook, $now ) );
+	}
+
+	public function test_is_user_id_identifies_wp_prefixed_ids() {
+		$this->assertTrue( Resolver::is_user_id( 'wp_abc123' ) );
+		$this->assertFalse( Resolver::is_user_id( '0190-anon' ) );
+		$this->assertFalse( Resolver::is_user_id( 'wc_order_55' ) );
+	}
 }
