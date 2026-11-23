@@ -232,5 +232,53 @@ final class EnqueueTest extends TestCase {
 		$this->assertStringContainsString( 'posthog.init("phc_test_123456"', $this->printed[0]['js'] );
 		$this->assertStringContainsString( 'posthog.identify("wp_', $this->printed[0]['js'] );
 		$this->assertStringNotContainsString( '"persistence":"memory"', $this->printed[0]['js'] );
+		$this->assertStringContainsString( '"capture_heatmaps":true', $this->printed[0]['js'] );
+	}
+
+	public function test_logout_cookie_triggers_posthog_reset_when_logged_out() {
+		$_COOKIE[ Enqueue::RESET_COOKIE ] = '1';
+
+		Functions\when( 'get_option' )->justReturn(
+			$this->configured_options(
+				array(
+					'excluded_roles' => array(),
+					'consent_mode'   => Policy::CONSENT_OFF,
+					'respect_dnt'    => false,
+				)
+			)
+		);
+		Functions\when( 'is_user_logged_in' )->justReturn( false );
+		Functions\when( 'wp_has_consent' )->justReturn( true );
+
+		( new Enqueue() )->print_snippet();
+
+		unset( $_COOKIE[ Enqueue::RESET_COOKIE ] );
+
+		$this->assertCount( 1, $this->printed );
+		$this->assertStringContainsString( 'posthog.reset();', $this->printed[0]['js'] );
+	}
+
+	public function test_session_recording_includes_masking_and_capture_exceptions() {
+		$opts                      = $this->configured_options(
+			array(
+				'excluded_roles' => array(),
+				'consent_mode'   => Policy::CONSENT_OFF,
+				'respect_dnt'    => false,
+			)
+		);
+		$opts['posthog']['client'] = array(
+			'session_recording'  => true,
+			'capture_exceptions' => true,
+		);
+		Functions\when( 'get_option' )->justReturn( $opts );
+		Functions\when( 'is_user_logged_in' )->justReturn( false );
+		Functions\when( 'wp_has_consent' )->justReturn( true );
+
+		( new Enqueue() )->print_snippet();
+
+		$this->assertCount( 1, $this->printed );
+		$this->assertStringContainsString( '"maskAllInputs":true', $this->printed[0]['js'] );
+		$this->assertStringContainsString( '"maskTextSelector":".woocommerce-customer-details"', $this->printed[0]['js'] );
+		$this->assertStringContainsString( '"capture_exceptions":true', $this->printed[0]['js'] );
 	}
 }

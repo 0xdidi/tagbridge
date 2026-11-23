@@ -9,7 +9,10 @@ namespace Tagbridge\Modules\PostHog\Events;
 
 use Tagbridge\Core\Events\Schema;
 use Tagbridge\Core\Events\ServerClient;
+use Tagbridge\Core\Identity\Resolver;
+use Tagbridge\Modules\PostHog\Identity;
 use Tagbridge\Modules\PostHog\Settings;
+use Tagbridge\Platform\Http\RequestContext;
 
 /**
  * Bridges WordPress events to the platform-agnostic ServerClient.
@@ -66,7 +69,7 @@ final class Dispatcher {
 	 * @return void
 	 */
 	public function capture( $event_key, $distinct_id, array $properties = array() ) {
-		if ( ! Settings::is_server_event_enabled( $event_key ) ) {
+		if ( '' === (string) $distinct_id || ! Settings::is_server_event_enabled( $event_key ) ) {
 			return;
 		}
 
@@ -80,9 +83,65 @@ final class Dispatcher {
 			return;
 		}
 
+		$properties = $this->with_request_context( $properties );
+		$properties = $this->with_person_profile_mode( (string) $distinct_id, $properties );
+
 		if ( ! $client->capture( $distinct_id, $events[ $event_key ], $properties ) ) {
 			$this->log( 'capture ' . $event_key . ' failed: ' . $client->last_error() );
 		}
+	}
+
+	/**
+	 * Honor person_profiles: identified_only on server-side events.
+	 *
+	 * @param string              $distinct_id Resolved distinct id.
+	 * @param array<string,mixed> $properties  Event properties.
+	 * @return array<string,mixed>
+	 */
+	private function with_person_profile_mode( $distinct_id, array $properties ) {
+		if ( isset( $properties['$process_person_profile'] ) ) {
+			return $properties;
+		}
+
+		$client = Settings::client();
+		$mode   = isset( $client['person_profiles'] ) ? (string) $client['person_profiles'] : 'identified_only';
+
+		if ( 'identified_only' === $mode && ! Resolver::is_user_id( $distinct_id ) ) {
+			$properties['$process_person_profile'] = false;
+		}
+
+		return $properties;
+	}
+
+	/**
+	 * Attach proxy-safe visitor IP, raw user agent, and browser session id.
+	 *
+	 * @param array<string,mixed> $properties Event properties.
+	 * @return array<string,mixed>
+	 */
+	private function with_request_context( array $properties ) {
+		if ( ! isset( $properties['$raw_user_agent'] ) ) {
+			$ua = RequestContext::user_agent();
+			if ( '' !== $ua ) {
+				$properties['$raw_user_agent'] = $ua;
+			}
+		}
+
+		if ( ! isset( $properties['$ip'] ) ) {
+			$ip = RequestContext::client_ip();
+			if ( '' !== $ip ) {
+				$properties['$ip'] = $ip;
+			}
+		}
+
+		if ( ! isset( $properties['$session_id'] ) ) {
+			$session_id = Identity::cookie_session_id();
+			if ( null !== $session_id && '' !== $session_id ) {
+				$properties['$session_id'] = $session_id;
+			}
+		}
+
+		return $properties;
 	}
 
 	/**

@@ -8,6 +8,10 @@
 namespace Tagbridge\Modules\PostHog;
 
 use Tagbridge\Core\Identity\Resolver;
+use Tagbridge\Core\Privacy\ConsentCategory;
+use Tagbridge\Core\Privacy\Policy;
+use Tagbridge\Platform\Privacy\PrivacyGate;
+use Tagbridge\Platform\Settings\GlobalSettings;
 
 /**
  * Resolves the current visitor's PostHog identity from WordPress state.
@@ -15,13 +19,26 @@ use Tagbridge\Core\Identity\Resolver;
 final class Identity {
 
 	/**
-	 * The distinct id stored by posthog-js in its cookie, if present.
+	 * Whether server-side code may read the posthog-js cookie for this request.
+	 *
+	 * @return bool
+	 */
+	public static function may_read_posthog_cookie() {
+		if ( Policy::CONSENT_OFF === GlobalSettings::consent_mode() ) {
+			return true;
+		}
+
+		return PrivacyGate::has_consent( ConsentCategory::STATISTICS );
+	}
+
+	/**
+	 * The distinct id stored by posthog-js in its cookie, if present and permitted.
 	 *
 	 * @return string|null
 	 */
 	public static function cookie_distinct_id() {
 		$key = Settings::project_api_key();
-		if ( '' === $key ) {
+		if ( '' === $key || ! self::may_read_posthog_cookie() ) {
 			return null;
 		}
 
@@ -36,6 +53,31 @@ final class Identity {
 		$distinct_id = Resolver::parse_distinct_id( $raw );
 
 		return null === $distinct_id ? null : sanitize_text_field( $distinct_id );
+	}
+
+	/**
+	 * The browser's current session id from the posthog-js cookie, if fresh and permitted.
+	 *
+	 * @return string|null
+	 */
+	public static function cookie_session_id() {
+		$key = Settings::project_api_key();
+		if ( '' === $key || ! self::may_read_posthog_cookie() ) {
+			return null;
+		}
+
+		$name = Resolver::cookie_name( $key );
+		if ( empty( $_COOKIE[ $name ] ) ) {
+			return null;
+		}
+
+		$raw = wp_unslash( $_COOKIE[ $name ] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		$raw = is_string( $raw ) ? $raw : '';
+
+		$now_ms     = (int) round( microtime( true ) * 1000 );
+		$session_id = Resolver::parse_session_id( $raw, $now_ms );
+
+		return null === $session_id ? null : sanitize_text_field( $session_id );
 	}
 
 	/**
@@ -114,6 +156,48 @@ final class Identity {
 		$identified_id = $identity ? $identity['distinct_id'] : null;
 
 		return Resolver::resolve_distinct_id( self::cookie_distinct_id(), $identified_id, $fallback );
+	}
+
+	/**
+	 * Existing WooCommerce session customer id when a session cookie already exists.
+	 *
+	 * @return string|null
+	 */
+	public static function existing_wc_session_id() {
+		if ( ! function_exists( 'WC' ) ) {
+			return null;
+		}
+
+		$prefix = 'wp_woocommerce_session_';
+		$has    = false;
+		foreach ( array_keys( $_COOKIE ) as $cookie_name ) {
+			if ( is_string( $cookie_name ) && 0 === strpos( $cookie_name, $prefix ) ) {
+				$has = true;
+				break;
+			}
+		}
+
+		if ( ! $has ) {
+			return null;
+		}
+
+		$wc = WC();
+		if ( ! is_object( $wc ) || empty( $wc->session ) || ! method_exists( $wc->session, 'get_customer_id' ) ) {
+			return null;
+		}
+
+		$customer_id = sanitize_text_field( (string) $wc->session->get_customer_id() );
+		return '' !== $customer_id ? 'wc_sess_' . $customer_id : null;
+	}
+
+	/**
+	 * Resolve a stable distinct id for an in-session visitor without inventing random UUIDs.
+	 *
+	 * @return string Empty string when no stable identifier exists.
+	 */
+	public static function server_visitor_distinct_id() {
+		$resolved = self::server_distinct_id( self::existing_wc_session_id() );
+		return $resolved['distinct_id'];
 	}
 
 	/**

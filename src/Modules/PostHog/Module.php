@@ -117,7 +117,10 @@ final class Module implements ConfigurableModule, EventSubscriberInterface {
 	 */
 	public function capture_order_distinct_id( array $meta, $order ) {
 		unset( $order );
-		$meta[ self::ORDER_DISTINCT_ID_META ] = $this->visitor_distinct_id();
+		$distinct_id = $this->visitor_distinct_id();
+		if ( '' !== $distinct_id ) {
+			$meta[ self::ORDER_DISTINCT_ID_META ] = $distinct_id;
+		}
 		return $meta;
 	}
 
@@ -154,7 +157,10 @@ final class Module implements ConfigurableModule, EventSubscriberInterface {
 
 			case Schema::PRODUCT_VIEWED:
 			case Schema::PRODUCT_ADDED_TO_CART:
-				$this->dispatcher()->capture( $event->name(), $this->visitor_distinct_id(), $properties );
+				$distinct_id = $this->visitor_distinct_id();
+				if ( '' !== $distinct_id ) {
+					$this->dispatcher()->capture( $event->name(), $distinct_id, $properties );
+				}
 				break;
 
 			case Schema::CHECKOUT_STARTED:
@@ -166,8 +172,9 @@ final class Module implements ConfigurableModule, EventSubscriberInterface {
 				if ( '' === $distinct_id ) {
 					$distinct_id = $this->visitor_distinct_id();
 				}
-
-				$this->dispatcher()->capture( Schema::CHECKOUT_STARTED, $distinct_id, $properties );
+				if ( '' !== $distinct_id ) {
+					$this->dispatcher()->capture( Schema::CHECKOUT_STARTED, $distinct_id, $properties );
+				}
 				break;
 
 			case Schema::ORDER_COMPLETED:
@@ -219,13 +226,12 @@ final class Module implements ConfigurableModule, EventSubscriberInterface {
 	}
 
 	/**
-	 * Distinct id for an in-session visitor, falling back to a generated UUID.
+	 * Distinct id for an in-session visitor, or '' if no stable identifier exists.
 	 *
 	 * @return string
 	 */
 	private function visitor_distinct_id() {
-		$resolved = Identity::server_distinct_id();
-		return '' !== $resolved['distinct_id'] ? $resolved['distinct_id'] : wp_generate_uuid4();
+		return Identity::server_visitor_distinct_id();
 	}
 
 	/**
