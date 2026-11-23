@@ -2,14 +2,14 @@
 # This file is distributed under the GPL-2.0-or-later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Tagbridge – Deep Integration for PostHog 0.3.0\n"
+"Project-Id-Version: Tagbridge – Deep Integration for PostHog 0.4.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/tagbridge\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-11-19T18:13:03+00:00\n"
+"POT-Creation-Date: 2026-11-23T16:52:45+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: tagbridge\n"
@@ -67,240 +67,477 @@ msgstr ""
 msgid "PostHog returned an unexpected response (HTTP %d). Try again in a moment."
 msgstr ""
 
-#: src/Modules/PostHog/Module.php:61
-#: src/Platform/Plugin.php:89
+#: src/Modules/PostHog/Frontend/Enqueue.php:54
+msgid "1 year"
+msgstr ""
+
+#: src/Modules/PostHog/Frontend/Enqueue.php:55
+msgid "Stores an anonymous visitor ID and session state for analytics and session replay."
+msgstr ""
+
+#: src/Modules/PostHog/Frontend/Enqueue.php:56
+msgid "Anonymous ID, session ID"
+msgstr ""
+
+#: src/Modules/PostHog/Module.php:84
+#: src/Platform/Plugin.php:90
 msgid "PostHog"
 msgstr ""
 
-#: src/Modules/PostHog/Module.php:70
-#: src/Platform/Plugin.php:92
+#: src/Modules/PostHog/Module.php:93
+#: src/Platform/Plugin.php:93
 msgid "Send pageviews, autocapture, identity, and server-side events to PostHog."
 msgstr ""
 
-#: src/Modules/PostHog/Module.php:294
-#: src/Platform/Admin/SettingsPage.php:260
+#: src/Modules/PostHog/Module.php:150
+msgid "Validate and save"
+msgstr ""
+
+#: src/Modules/PostHog/Module.php:151
+msgid "We check your connection before saving."
+msgstr ""
+
+#: src/Modules/PostHog/Module.php:162
+#: src/Modules/Webhooks/Module.php:121
+#: src/Platform/Admin/SettingsPage.php:202
+#: src/Platform/Admin/SettingsPage.php:245
+#: src/Platform/Admin/SettingsPage.php:288
+#: src/Platform/Admin/SettingsPage.php:311
+msgid "You do not have permission to do that."
+msgstr ""
+
+#: src/Modules/PostHog/Module.php:192
+msgid "Reachable. Sent tagbridge_test_event to your PostHog project."
+msgstr ""
+
+#: src/Modules/PostHog/Module.php:193
+msgid "Key verified, but sending tagbridge_test_event failed."
+msgstr ""
+
+#: src/Modules/PostHog/Module.php:401
+#: src/Platform/Admin/SettingsPage.php:276
 msgid "Settings saved."
 msgstr ""
 
-#: src/Modules/PostHog/Module.php:305
+#: src/Modules/PostHog/Module.php:412
 msgid "Connected and saved. PostHog will start receiving events on your site."
 msgstr ""
 
-#: src/Modules/PostHog/SettingsPanel.php:41
-#: src/Modules/PostHog/SettingsPanel.php:85
+#: src/Modules/PostHog/SettingsPanel.php:42
+#: src/Modules/PostHog/SettingsPanel.php:87
 msgid "Connection"
 msgstr ""
 
-#: src/Modules/PostHog/SettingsPanel.php:42
-#: src/Modules/PostHog/SettingsPanel.php:146
+#: src/Modules/PostHog/SettingsPanel.php:43
+#: src/Modules/PostHog/SettingsPanel.php:148
 msgid "Tracking"
 msgstr ""
 
-#: src/Modules/PostHog/SettingsPanel.php:43
-#: src/Modules/PostHog/SettingsPanel.php:199
+#: src/Modules/PostHog/SettingsPanel.php:44
+#: src/Modules/PostHog/SettingsPanel.php:215
 msgid "Identity"
 msgstr ""
 
-#: src/Modules/PostHog/SettingsPanel.php:44
+#: src/Modules/PostHog/SettingsPanel.php:45
 msgid "Server events"
 msgstr ""
 
-#: src/Modules/PostHog/SettingsPanel.php:64
+#: src/Modules/PostHog/SettingsPanel.php:46
+msgid "Diagnostics"
+msgstr ""
+
+#: src/Modules/PostHog/SettingsPanel.php:66
 msgid "PostHog settings"
 msgstr ""
 
-#: src/Modules/PostHog/SettingsPanel.php:87
-#: src/Platform/Admin/SettingsPage.php:562
-#: src/Platform/Admin/SettingsPage.php:681
+#: src/Modules/PostHog/SettingsPanel.php:89
+#: src/Platform/Admin/SettingsPage.php:578
+#: src/Platform/Admin/SettingsPage.php:697
 msgid "Connected"
 msgstr ""
 
-#: src/Modules/PostHog/SettingsPanel.php:89
+#: src/Modules/PostHog/SettingsPanel.php:91
 msgid "Not connected"
 msgstr ""
 
-#: src/Modules/PostHog/SettingsPanel.php:94
+#: src/Modules/PostHog/SettingsPanel.php:96
 msgid "Paste your PostHog project API key and pick your region. We check it before saving."
 msgstr ""
 
-#: src/Modules/PostHog/SettingsPanel.php:98
+#: src/Modules/PostHog/SettingsPanel.php:100
 msgid "Project API key"
 msgstr ""
 
-#: src/Modules/PostHog/SettingsPanel.php:110
-msgid "Find this in PostHog under Settings, Project, Project API key. It is safe to expose in the browser."
-msgstr ""
-
-#: src/Modules/PostHog/SettingsPanel.php:115
-msgid "Region"
+#: src/Modules/PostHog/SettingsPanel.php:112
+msgid "Find this in PostHog under Settings, Project, Project token (or Project API key). It is safe to expose in the browser."
 msgstr ""
 
 #: src/Modules/PostHog/SettingsPanel.php:117
-msgid "US cloud (us.i.posthog.com)"
-msgstr ""
-
-#: src/Modules/PostHog/SettingsPanel.php:118
-msgid "EU cloud (eu.i.posthog.com)"
+msgid "Region"
 msgstr ""
 
 #: src/Modules/PostHog/SettingsPanel.php:119
+msgid "US cloud (us.i.posthog.com)"
+msgstr ""
+
+#: src/Modules/PostHog/SettingsPanel.php:120
+msgid "EU cloud (eu.i.posthog.com)"
+msgstr ""
+
+#: src/Modules/PostHog/SettingsPanel.php:121
 msgid "Self-hosted or reverse proxy"
 msgstr ""
 
-#: src/Modules/PostHog/SettingsPanel.php:124
+#: src/Modules/PostHog/SettingsPanel.php:126
 msgid "Custom host URL"
 msgstr ""
 
-#: src/Modules/PostHog/SettingsPanel.php:136
+#: src/Modules/PostHog/SettingsPanel.php:138
 msgid "The full URL of your PostHog instance or reverse proxy, including https://."
 msgstr ""
 
-#: src/Modules/PostHog/SettingsPanel.php:150
+#: src/Modules/PostHog/SettingsPanel.php:152
 msgid "What PostHog captures in the browser."
 msgstr ""
 
-#: src/Modules/PostHog/SettingsPanel.php:156
+#: src/Modules/PostHog/SettingsPanel.php:158
 msgid "Track pageviews"
 msgstr ""
 
-#: src/Modules/PostHog/SettingsPanel.php:157
+#: src/Modules/PostHog/SettingsPanel.php:159
 msgid "A pageview each time someone loads a page."
 msgstr ""
 
-#: src/Modules/PostHog/SettingsPanel.php:163
+#: src/Modules/PostHog/SettingsPanel.php:165
 msgid "Autocapture clicks and forms"
 msgstr ""
 
-#: src/Modules/PostHog/SettingsPanel.php:164
+#: src/Modules/PostHog/SettingsPanel.php:166
 msgid "Clicks, form submissions, and other interactions."
 msgstr ""
 
-#: src/Modules/PostHog/SettingsPanel.php:170
+#: src/Modules/PostHog/SettingsPanel.php:172
+msgid "Capture heatmaps"
+msgstr ""
+
+#: src/Modules/PostHog/SettingsPanel.php:173
+msgid "Collect click and scroll heatmap data when enabled in PostHog."
+msgstr ""
+
+#: src/Modules/PostHog/SettingsPanel.php:179
 msgid "Record sessions"
 msgstr ""
 
-#: src/Modules/PostHog/SettingsPanel.php:171
-msgid "Session replays. Heavier, so off by default."
+#: src/Modules/PostHog/SettingsPanel.php:180
+msgid "Session replays with form inputs and customer details masked."
 msgstr ""
 
-#: src/Modules/PostHog/SettingsPanel.php:177
+#: src/Modules/PostHog/SettingsPanel.php:186
+msgid "Capture JavaScript errors"
+msgstr ""
+
+#: src/Modules/PostHog/SettingsPanel.php:187
+msgid "Send unhandled browser exceptions to PostHog error tracking."
+msgstr ""
+
+#: src/Modules/PostHog/SettingsPanel.php:193
 msgid "Cookieless mode"
 msgstr ""
 
-#: src/Modules/PostHog/SettingsPanel.php:178
+#: src/Modules/PostHog/SettingsPanel.php:194
 msgid "Keep visitor state in memory; no PostHog cookie."
 msgstr ""
 
-#: src/Modules/PostHog/SettingsPanel.php:184
+#: src/Modules/PostHog/SettingsPanel.php:200
 msgid "Person profiles"
 msgstr ""
 
-#: src/Modules/PostHog/SettingsPanel.php:185
+#: src/Modules/PostHog/SettingsPanel.php:201
 msgid "Identified-only is the usual choice."
 msgstr ""
 
-#: src/Modules/PostHog/SettingsPanel.php:188
+#: src/Modules/PostHog/SettingsPanel.php:204
 msgid "Identified only"
 msgstr ""
 
-#: src/Modules/PostHog/SettingsPanel.php:189
+#: src/Modules/PostHog/SettingsPanel.php:205
 msgid "Everyone"
 msgstr ""
 
-#: src/Modules/PostHog/SettingsPanel.php:205
+#: src/Modules/PostHog/SettingsPanel.php:221
 msgid "Identify logged-in users"
 msgstr ""
 
-#: src/Modules/PostHog/SettingsPanel.php:212
+#: src/Modules/PostHog/SettingsPanel.php:228
 msgid "Tie logged-in users to one PostHog person with a hashed ID (never the raw user ID). Choose which properties to send."
 msgstr ""
 
-#: src/Modules/PostHog/SettingsPanel.php:219
+#: src/Modules/PostHog/SettingsPanel.php:235
 msgid "Send email address"
 msgstr ""
 
-#: src/Modules/PostHog/SettingsPanel.php:220
+#: src/Modules/PostHog/SettingsPanel.php:236
 msgid "Attach the user email to their profile."
 msgstr ""
 
-#: src/Modules/PostHog/SettingsPanel.php:226
+#: src/Modules/PostHog/SettingsPanel.php:242
 msgid "Send display name"
 msgstr ""
 
-#: src/Modules/PostHog/SettingsPanel.php:227
+#: src/Modules/PostHog/SettingsPanel.php:243
 msgid "Attach the display name to their profile."
 msgstr ""
 
-#: src/Modules/PostHog/SettingsPanel.php:233
+#: src/Modules/PostHog/SettingsPanel.php:249
 msgid "Send role"
 msgstr ""
 
-#: src/Modules/PostHog/SettingsPanel.php:234
+#: src/Modules/PostHog/SettingsPanel.php:250
 msgid "Attach the primary role to their profile."
 msgstr ""
 
-#: src/Modules/PostHog/SettingsPanel.php:245
+#: src/Modules/PostHog/SettingsPanel.php:261
 msgid "Server-side events"
 msgstr ""
 
-#: src/Modules/PostHog/SettingsPanel.php:251
+#: src/Modules/PostHog/SettingsPanel.php:267
 msgid "Send events from the server"
 msgstr ""
 
-#: src/Modules/PostHog/SettingsPanel.php:258
+#: src/Modules/PostHog/SettingsPanel.php:274
 msgid "Send key events from your own WordPress server, so they still arrive when a visitor's browser blocks tracking. Runs on your existing hosting; nothing extra to set up."
 msgstr ""
 
-#: src/Modules/PostHog/SettingsPanel.php:265
+#: src/Modules/PostHog/SettingsPanel.php:281
+#: src/Modules/Webhooks/SettingsPanel.php:179
 msgid "User logged in"
 msgstr ""
 
-#: src/Modules/PostHog/SettingsPanel.php:266
+#: src/Modules/PostHog/SettingsPanel.php:282
 msgid "Capture when a user logs in."
 msgstr ""
 
-#: src/Modules/PostHog/SettingsPanel.php:272
+#: src/Modules/PostHog/SettingsPanel.php:288
+#: src/Modules/Webhooks/SettingsPanel.php:180
 msgid "User registered"
 msgstr ""
 
-#: src/Modules/PostHog/SettingsPanel.php:273
+#: src/Modules/PostHog/SettingsPanel.php:289
 msgid "Capture when a new account is created."
 msgstr ""
 
-#: src/Modules/PostHog/SettingsPanel.php:281
+#: src/Modules/PostHog/SettingsPanel.php:297
+#: src/Modules/Webhooks/SettingsPanel.php:181
 msgid "Product viewed"
 msgstr ""
 
-#: src/Modules/PostHog/SettingsPanel.php:282
+#: src/Modules/PostHog/SettingsPanel.php:298
 msgid "WooCommerce: a product page was viewed."
 msgstr ""
 
-#: src/Modules/PostHog/SettingsPanel.php:288
+#: src/Modules/PostHog/SettingsPanel.php:304
 msgid "Added to cart"
 msgstr ""
 
-#: src/Modules/PostHog/SettingsPanel.php:289
+#: src/Modules/PostHog/SettingsPanel.php:305
 msgid "WooCommerce: a product was added to the cart."
 msgstr ""
 
-#: src/Modules/PostHog/SettingsPanel.php:295
+#: src/Modules/PostHog/SettingsPanel.php:311
+#: src/Modules/Webhooks/SettingsPanel.php:183
 msgid "Checkout started"
 msgstr ""
 
-#: src/Modules/PostHog/SettingsPanel.php:296
+#: src/Modules/PostHog/SettingsPanel.php:312
 msgid "WooCommerce: a checkout was submitted."
 msgstr ""
 
-#: src/Modules/PostHog/SettingsPanel.php:302
+#: src/Modules/PostHog/SettingsPanel.php:318
+#: src/Modules/Webhooks/SettingsPanel.php:184
 msgid "Order completed"
 msgstr ""
 
-#: src/Modules/PostHog/SettingsPanel.php:303
+#: src/Modules/PostHog/SettingsPanel.php:319
 msgid "WooCommerce: an order completed, with value and currency."
 msgstr ""
 
-#: src/Modules/PostHog/SettingsPanel.php:309
+#: src/Modules/PostHog/SettingsPanel.php:325
 msgid "WooCommerce is not active. Install it to capture commerce events (product views, add to cart, checkout, orders)."
+msgstr ""
+
+#: src/Modules/PostHog/SettingsPanel.php:343
+msgid "Live check & test event"
+msgstr ""
+
+#: src/Modules/PostHog/SettingsPanel.php:352
+msgid "Verify PostHog host reachability and send a clearly labeled tagbridge_test_event (without creating a person profile)."
+msgstr ""
+
+#: src/Modules/PostHog/SettingsPanel.php:361
+msgid "Send test event"
+msgstr ""
+
+#: src/Modules/PostHog/SettingsPanel.php:373
+msgid "Enable PostHog and save your project API key before sending a test event."
+msgstr ""
+
+#: src/Modules/PostHog/SettingsPanel.php:381
+msgid "Troubleshooting"
+msgstr ""
+
+#. translators: 1: script host, 2: ingestion host.
+#: src/Modules/PostHog/SettingsPanel.php:389
+#, php-format
+msgid "Content Security Policy (CSP): allow %1$s in script-src and %2$s in connect-src if your site enforces strict CSP headers."
+msgstr ""
+
+#: src/Modules/PostHog/SettingsPanel.php:397
+msgid "Duplicate snippets: if another theme or tag manager already calls posthog.init(), remove the duplicate snippet so pageviews and identities are not split."
+msgstr ""
+
+#: src/Modules/PostHog/SettingsPanel.php:400
+msgid "Feature flags: use the PostHog Feature Flag block or [tagbridge_flag key=\"my-flag\"]content[/tagbridge_flag] shortcode. Full-page caches may serve one variant to anonymous visitors unless bypassed."
+msgstr ""
+
+#: src/Modules/Webhooks/Dispatcher.php:65
+msgid "No webhook endpoint URL is configured."
+msgstr ""
+
+#: src/Modules/Webhooks/Dispatcher.php:73
+msgid "Event is disabled."
+msgstr ""
+
+#: src/Modules/Webhooks/Dispatcher.php:82
+msgid "Failed to encode webhook payload."
+msgstr ""
+
+#. translators: %d: HTTP status code.
+#: src/Modules/Webhooks/Dispatcher.php:131
+#, php-format
+msgid "Delivered (HTTP %d)."
+msgstr ""
+
+#. translators: %d: HTTP status code.
+#: src/Modules/Webhooks/Dispatcher.php:133
+#, php-format
+msgid "Endpoint returned HTTP %d."
+msgstr ""
+
+#: src/Modules/Webhooks/Module.php:56
+#: src/Platform/Modules/Catalog.php:25
+#: src/Platform/Plugin.php:103
+msgid "Webhooks"
+msgstr ""
+
+#: src/Modules/Webhooks/Module.php:65
+#: src/Platform/Modules/Catalog.php:26
+#: src/Platform/Plugin.php:106
+msgid "Send signed JSON event payloads to Zapier, Make, n8n, or your own endpoint."
+msgstr ""
+
+#: src/Modules/Webhooks/Module.php:181
+#: src/Modules/Webhooks/Module.php:195
+msgid "Webhook settings saved."
+msgstr ""
+
+#: src/Modules/Webhooks/Module.php:189
+msgid "Please enter a valid http:// or https:// endpoint URL."
+msgstr ""
+
+#: src/Modules/Webhooks/SettingsPanel.php:41
+msgid "Endpoint"
+msgstr ""
+
+#: src/Modules/Webhooks/SettingsPanel.php:42
+msgid "Events"
+msgstr ""
+
+#: src/Modules/Webhooks/SettingsPanel.php:59
+msgid "Webhooks settings"
+msgstr ""
+
+#: src/Modules/Webhooks/SettingsPanel.php:80
+msgid "Webhook endpoint"
+msgstr ""
+
+#: src/Modules/Webhooks/SettingsPanel.php:82
+msgid "Configured"
+msgstr ""
+
+#: src/Modules/Webhooks/SettingsPanel.php:84
+msgid "Not configured"
+msgstr ""
+
+#: src/Modules/Webhooks/SettingsPanel.php:89
+msgid "Send normalized JSON payloads for WordPress and WooCommerce events to Zapier, Make, n8n, or your own HTTPS endpoint."
+msgstr ""
+
+#: src/Modules/Webhooks/SettingsPanel.php:93
+msgid "Endpoint URL"
+msgstr ""
+
+#: src/Modules/Webhooks/SettingsPanel.php:105
+msgid "Must be a valid https:// or http:// URL that accepts POST JSON requests."
+msgstr ""
+
+#: src/Modules/Webhooks/SettingsPanel.php:110
+msgid "Signing secret (optional)"
+msgstr ""
+
+#: src/Modules/Webhooks/SettingsPanel.php:122
+msgid "When set, Tagbridge signs the raw JSON body using HMAC-SHA256 in the X-Tagbridge-Signature header (sha256=...)."
+msgstr ""
+
+#: src/Modules/Webhooks/SettingsPanel.php:130
+msgid "Test delivery"
+msgstr ""
+
+#: src/Modules/Webhooks/SettingsPanel.php:139
+msgid "Send a sample tagbridge_test_webhook payload to verify your endpoint and signature."
+msgstr ""
+
+#: src/Modules/Webhooks/SettingsPanel.php:148
+msgid "Send test webhook"
+msgstr ""
+
+#: src/Modules/Webhooks/SettingsPanel.php:160
+msgid "Enable Webhooks and save an endpoint URL first before sending a test delivery."
+msgstr ""
+
+#: src/Modules/Webhooks/SettingsPanel.php:170
+msgid "Subscribed events"
+msgstr ""
+
+#: src/Modules/Webhooks/SettingsPanel.php:174
+msgid "Choose which normalized WordPress and WooCommerce events trigger a webhook request."
+msgstr ""
+
+#: src/Modules/Webhooks/SettingsPanel.php:179
+msgid "WordPress: a user signed in."
+msgstr ""
+
+#: src/Modules/Webhooks/SettingsPanel.php:180
+msgid "WordPress: a new user account was created."
+msgstr ""
+
+#: src/Modules/Webhooks/SettingsPanel.php:181
+msgid "WooCommerce: a single product page was viewed."
+msgstr ""
+
+#: src/Modules/Webhooks/SettingsPanel.php:182
+msgid "Product added to cart"
+msgstr ""
+
+#: src/Modules/Webhooks/SettingsPanel.php:182
+msgid "WooCommerce: an item was added to the cart."
+msgstr ""
+
+#: src/Modules/Webhooks/SettingsPanel.php:183
+msgid "WooCommerce: a checkout order was submitted."
+msgstr ""
+
+#: src/Modules/Webhooks/SettingsPanel.php:184
+msgid "WooCommerce: an order reached a paid or completed status."
 msgstr ""
 
 #: src/Platform/Admin/Notices.php:156
@@ -324,7 +561,7 @@ msgid "Dismiss"
 msgstr ""
 
 #: src/Platform/Admin/Notices.php:195
-#: src/Platform/Admin/SettingsPage.php:568
+#: src/Platform/Admin/SettingsPage.php:584
 msgid "Configure"
 msgstr ""
 
@@ -340,262 +577,241 @@ msgid_plural "%s are now available in Tagbridge."
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Platform/Admin/SettingsPage.php:186
-#: src/Platform/Admin/SettingsPage.php:229
-#: src/Platform/Admin/SettingsPage.php:272
-#: src/Platform/Admin/SettingsPage.php:295
-msgid "You do not have permission to do that."
-msgstr ""
-
-#: src/Platform/Admin/SettingsPage.php:193
-#: src/Platform/Admin/SettingsPage.php:237
+#: src/Platform/Admin/SettingsPage.php:209
+#: src/Platform/Admin/SettingsPage.php:253
 msgid "Unknown integration."
 msgstr ""
 
 #. translators: %s: integration name.
-#: src/Platform/Admin/SettingsPage.php:209
+#: src/Platform/Admin/SettingsPage.php:225
 #, php-format
 msgid "%s enabled."
 msgstr ""
 
 #. translators: %s: integration name.
-#: src/Platform/Admin/SettingsPage.php:212
+#: src/Platform/Admin/SettingsPage.php:228
 #, php-format
 msgid "%s disabled."
 msgstr ""
 
-#: src/Platform/Admin/SettingsPage.php:284
+#: src/Platform/Admin/SettingsPage.php:300
 msgid "Privacy and platform settings saved."
 msgstr ""
 
-#: src/Platform/Admin/SettingsPage.php:303
+#: src/Platform/Admin/SettingsPage.php:319
 msgid "Unknown upcoming integration."
 msgstr ""
 
 #. translators: %s: upcoming integration name.
-#: src/Platform/Admin/SettingsPage.php:313
+#: src/Platform/Admin/SettingsPage.php:329
 #, php-format
 msgid "You will be notified in WordPress when %s launches in a Tagbridge update."
 msgstr ""
 
 #. translators: %s: upcoming integration name.
-#: src/Platform/Admin/SettingsPage.php:316
+#: src/Platform/Admin/SettingsPage.php:332
 #, php-format
 msgid "Removed %s from your launch notifications."
 msgstr ""
 
-#: src/Platform/Admin/SettingsPage.php:411
+#: src/Platform/Admin/SettingsPage.php:427
 msgid "Analytics"
 msgstr ""
 
-#: src/Platform/Admin/SettingsPage.php:412
+#: src/Platform/Admin/SettingsPage.php:428
 msgid "Ads & Conversions"
 msgstr ""
 
-#: src/Platform/Admin/SettingsPage.php:413
+#: src/Platform/Admin/SettingsPage.php:429
 msgid "Lifecycle & CRM"
 msgstr ""
 
-#: src/Platform/Admin/SettingsPage.php:414
+#: src/Platform/Admin/SettingsPage.php:430
 msgid "Support"
 msgstr ""
 
-#: src/Platform/Admin/SettingsPage.php:415
+#: src/Platform/Admin/SettingsPage.php:431
 msgid "Automation"
 msgstr ""
 
-#: src/Platform/Admin/SettingsPage.php:428
+#: src/Platform/Admin/SettingsPage.php:444
 msgid "You do not have permission to view this page."
 msgstr ""
 
-#: src/Platform/Admin/SettingsPage.php:450
+#: src/Platform/Admin/SettingsPage.php:466
 msgid "That integration could not be found."
 msgstr ""
 
-#: src/Platform/Admin/SettingsPage.php:498
+#: src/Platform/Admin/SettingsPage.php:514
 msgid "Connect WordPress to the tools you already use."
 msgstr ""
 
-#: src/Platform/Admin/SettingsPage.php:503
+#: src/Platform/Admin/SettingsPage.php:519
 msgid "Tagbridge sections"
 msgstr ""
 
-#: src/Platform/Admin/SettingsPage.php:509
+#: src/Platform/Admin/SettingsPage.php:525
 msgid "Integrations"
 msgstr ""
 
-#: src/Platform/Admin/SettingsPage.php:516
+#: src/Platform/Admin/SettingsPage.php:532
 msgid "Privacy & Settings"
 msgstr ""
 
-#: src/Platform/Admin/SettingsPage.php:560
-#: src/Platform/Admin/SettingsPage.php:679
+#: src/Platform/Admin/SettingsPage.php:576
+#: src/Platform/Admin/SettingsPage.php:695
 msgid "Disabled"
 msgstr ""
 
-#: src/Platform/Admin/SettingsPage.php:564
-#: src/Platform/Admin/SettingsPage.php:683
+#: src/Platform/Admin/SettingsPage.php:580
+#: src/Platform/Admin/SettingsPage.php:699
 msgid "Needs setup"
 msgstr ""
 
 #. translators: %d: number of installed integrations.
-#: src/Platform/Admin/SettingsPage.php:580
+#: src/Platform/Admin/SettingsPage.php:596
 #, php-format
 msgid "%d integration available. Disabled integrations use zero runtime resources."
 msgid_plural "%d integrations available. Disabled integrations use zero runtime resources."
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Platform/Admin/SettingsPage.php:592
-#: src/Platform/Admin/SettingsPage.php:609
+#: src/Platform/Admin/SettingsPage.php:608
+#: src/Platform/Admin/SettingsPage.php:625
 msgid "Coming soon"
 msgstr ""
 
-#: src/Platform/Admin/SettingsPage.php:594
+#: src/Platform/Admin/SettingsPage.php:610
 msgid "Planned deep integrations. Select Notify me to receive a WordPress admin alert when a Tagbridge update adds it."
 msgstr ""
 
-#: src/Platform/Admin/SettingsPage.php:616
+#: src/Platform/Admin/SettingsPage.php:632
 msgid "Notifying on launch"
 msgstr ""
 
-#: src/Platform/Admin/SettingsPage.php:618
+#: src/Platform/Admin/SettingsPage.php:634
 msgid "Planned"
 msgstr ""
 
-#: src/Platform/Admin/SettingsPage.php:631
+#: src/Platform/Admin/SettingsPage.php:647
 msgid "Click to cancel launch notification"
 msgstr ""
 
-#: src/Platform/Admin/SettingsPage.php:633
+#: src/Platform/Admin/SettingsPage.php:649
 msgid "Notifying"
 msgstr ""
 
-#: src/Platform/Admin/SettingsPage.php:637
+#: src/Platform/Admin/SettingsPage.php:653
 msgid "Notify me"
 msgstr ""
 
-#: src/Platform/Admin/SettingsPage.php:663
+#: src/Platform/Admin/SettingsPage.php:679
 msgid "All integrations"
 msgstr ""
 
-#: src/Platform/Admin/SettingsPage.php:691
+#: src/Platform/Admin/SettingsPage.php:707
 msgid "This integration is currently disabled. Enable it above to start sending data; you can still update its settings below."
 msgstr ""
 
-#: src/Platform/Admin/SettingsPage.php:706
-msgid "Validate and save"
-msgstr ""
-
-#: src/Platform/Admin/SettingsPage.php:708
-msgid "We check your connection before saving."
-msgstr ""
-
-#: src/Platform/Admin/SettingsPage.php:736
-msgid "Consent (WordPress Consent API)"
-msgstr ""
-
-#: src/Platform/Admin/SettingsPage.php:738
-msgid "WP Consent API active"
-msgstr ""
-
-#: src/Platform/Admin/SettingsPage.php:740
-msgid "WP Consent API not installed"
-msgstr ""
-
-#: src/Platform/Admin/SettingsPage.php:745
-msgid "Control how Tagbridge integrations wait for visitor consent when using a WordPress Consent API compatible banner."
-msgstr ""
-
-#: src/Platform/Admin/SettingsPage.php:749
-msgid "Consent behavior"
-msgstr ""
-
-#: src/Platform/Admin/SettingsPage.php:752
-msgid "Off: track visitors without checking consent"
-msgstr ""
-
-#: src/Platform/Admin/SettingsPage.php:755
-msgid "Require consent: wait until consent is granted"
-msgstr ""
-
-#: src/Platform/Admin/SettingsPage.php:758
-msgid "Cookieless until consent: track anonymously in memory first"
-msgstr ""
-
-#: src/Platform/Admin/SettingsPage.php:762
-msgid "Before consent is granted, \"Require consent\" blocks scripts and server events; \"Cookieless until consent\" runs in memory without cookies or person identification. When consent is withdrawn, browser tracking opts out immediately."
-msgstr ""
-
-#: src/Platform/Admin/SettingsPage.php:768
-msgid "Respect Do Not Track (DNT)"
-msgstr ""
-
-#: src/Platform/Admin/SettingsPage.php:769
-msgid "Skip browser and server-side tracking when a visitor sends a DNT: 1 header."
-msgstr ""
-
-#: src/Platform/Admin/SettingsPage.php:785
-msgid "Exclude user roles"
-msgstr ""
-
-#: src/Platform/Admin/SettingsPage.php:789
-msgid "Logged-in visitors with any selected role are excluded from browser tracking and server-side events across all integrations."
-msgstr ""
-
-#: src/Platform/Admin/SettingsPage.php:812
-msgid "Event sources"
-msgstr ""
-
-#: src/Platform/Admin/SettingsPage.php:816
-msgid "Tagbridge captures these events once and fans them out to every enabled integration."
-msgstr ""
-
-#: src/Platform/Admin/SettingsPage.php:821
-msgid "WordPress Core"
-msgstr ""
-
-#: src/Platform/Admin/SettingsPage.php:822
-msgid "Captures user_logged_in and user_registered."
-msgstr ""
-
-#: src/Platform/Admin/SettingsPage.php:824
-#: src/Platform/Admin/SettingsPage.php:833
-msgid "Active"
-msgstr ""
-
-#: src/Platform/Admin/SettingsPage.php:829
-msgid "WooCommerce"
-msgstr ""
-
-#: src/Platform/Admin/SettingsPage.php:830
-msgid "Captures product_viewed, product_added_to_cart, checkout_started, and order_completed."
-msgstr ""
-
-#: src/Platform/Admin/SettingsPage.php:835
-msgid "Not active"
-msgstr ""
-
-#: src/Platform/Admin/SettingsPage.php:843
+#: src/Platform/Admin/SettingsPage.php:724
+#: src/Platform/Admin/SettingsPage.php:730
+#: src/Platform/Admin/SettingsPage.php:883
 msgid "Save settings"
 msgstr ""
 
+#: src/Platform/Admin/SettingsPage.php:776
+msgid "Consent (WordPress Consent API)"
+msgstr ""
+
+#: src/Platform/Admin/SettingsPage.php:778
+msgid "WP Consent API active"
+msgstr ""
+
+#: src/Platform/Admin/SettingsPage.php:780
+msgid "WP Consent API not installed"
+msgstr ""
+
+#: src/Platform/Admin/SettingsPage.php:785
+msgid "Control how Tagbridge integrations wait for visitor consent when using a WordPress Consent API compatible banner."
+msgstr ""
+
+#: src/Platform/Admin/SettingsPage.php:789
+msgid "Consent behavior"
+msgstr ""
+
+#: src/Platform/Admin/SettingsPage.php:792
+msgid "Off: track visitors without checking consent"
+msgstr ""
+
+#: src/Platform/Admin/SettingsPage.php:795
+msgid "Require consent: wait until consent is granted"
+msgstr ""
+
+#: src/Platform/Admin/SettingsPage.php:798
+msgid "Cookieless until consent: track anonymously in memory first"
+msgstr ""
+
+#: src/Platform/Admin/SettingsPage.php:802
+msgid "Before consent is granted, \"Require consent\" blocks scripts and server events; \"Cookieless until consent\" runs in memory without cookies or person identification. When consent is withdrawn, browser tracking opts out immediately."
+msgstr ""
+
+#: src/Platform/Admin/SettingsPage.php:808
+msgid "Respect Do Not Track (DNT)"
+msgstr ""
+
+#: src/Platform/Admin/SettingsPage.php:809
+msgid "Skip browser and server-side tracking when a visitor sends a DNT: 1 header."
+msgstr ""
+
+#: src/Platform/Admin/SettingsPage.php:825
+msgid "Exclude user roles"
+msgstr ""
+
+#: src/Platform/Admin/SettingsPage.php:829
+msgid "Logged-in visitors with any selected role are excluded from browser tracking and server-side events across all integrations."
+msgstr ""
+
+#: src/Platform/Admin/SettingsPage.php:852
+msgid "Event sources"
+msgstr ""
+
+#: src/Platform/Admin/SettingsPage.php:856
+msgid "Tagbridge captures these events once and fans them out to every enabled integration."
+msgstr ""
+
+#: src/Platform/Admin/SettingsPage.php:861
+msgid "WordPress Core"
+msgstr ""
+
+#: src/Platform/Admin/SettingsPage.php:862
+msgid "Captures user_logged_in and user_registered."
+msgstr ""
+
+#: src/Platform/Admin/SettingsPage.php:864
+#: src/Platform/Admin/SettingsPage.php:873
+msgid "Active"
+msgstr ""
+
+#: src/Platform/Admin/SettingsPage.php:869
+msgid "WooCommerce"
+msgstr ""
+
+#: src/Platform/Admin/SettingsPage.php:870
+msgid "Captures product_viewed, product_added_to_cart, checkout_started, and order_completed."
+msgstr ""
+
+#: src/Platform/Admin/SettingsPage.php:875
+msgid "Not active"
+msgstr ""
+
 #. translators: %s: integration name.
-#: src/Platform/Admin/SettingsPage.php:896
+#: src/Platform/Admin/SettingsPage.php:936
 #, php-format
 msgid "Enable %s"
 msgstr ""
 
-#: src/Platform/Admin/SettingsPage.php:910
+#: src/Platform/Admin/SettingsPage.php:950
 msgid "Apply"
-msgstr ""
-
-#: src/Platform/Modules/Catalog.php:25
-msgid "Webhooks"
-msgstr ""
-
-#: src/Platform/Modules/Catalog.php:26
-msgid "Send signed JSON event payloads to Zapier, Make, n8n, or your own endpoint."
 msgstr ""
 
 #: src/Platform/Modules/Catalog.php:31
@@ -658,4 +874,40 @@ msgstr ""
 #: tagbridge.php:40
 #, php-format
 msgid "Tagbridge requires PHP %1$s or higher. You are running PHP %2$s. The plugin has been kept inactive to avoid breaking your site."
+msgstr ""
+
+#: assets/js/block-feature-flag.js:13
+msgid "PostHog Feature Flag"
+msgstr ""
+
+#: assets/js/block-feature-flag.js:14
+msgid "Show inner blocks only when a server-evaluated PostHog feature flag matches."
+msgstr ""
+
+#: assets/js/block-feature-flag.js:52
+msgid "Feature Flag Settings"
+msgstr ""
+
+#: assets/js/block-feature-flag.js:54
+msgid "Flag key"
+msgstr ""
+
+#: assets/js/block-feature-flag.js:61
+msgid "Match value"
+msgstr ""
+
+#: assets/js/block-feature-flag.js:62
+msgid "Use true, false, or a multivariate variant name."
+msgstr ""
+
+#: assets/js/block-feature-flag.js:69
+msgid "Fallback enabled when unconfigured"
+msgstr ""
+
+#: assets/js/block-feature-flag.js:84
+msgid "PostHog Flag:"
+msgstr ""
+
+#: assets/js/block-feature-flag.js:85
+msgid "PostHog Feature Flag (set Flag key in sidebar)"
 msgstr ""
