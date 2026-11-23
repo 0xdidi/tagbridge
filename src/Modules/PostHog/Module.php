@@ -130,7 +130,26 @@ final class Module implements ConfigurableModule, EventSubscriberInterface {
 		( new FeatureFlagBlock() )->register();
 
 		add_filter( 'tagbridge_order_checkout_meta', array( $this, 'capture_order_distinct_id' ), 10, 2 );
+		add_filter( 'tagbridge_module_save_copy', array( $this, 'filter_save_copy' ), 10, 2 );
 		add_action( 'admin_post_' . self::ACTION_TEST_EVENT, array( $this, 'handle_test_event' ) );
+	}
+
+	/**
+	 * Customize the save action bar copy for PostHog's live key check.
+	 *
+	 * @param array{button:string,note:string} $copy Default save copy.
+	 * @param string                           $id   Module id.
+	 * @return array{button:string,note:string}
+	 */
+	public function filter_save_copy( array $copy, $id ) {
+		if ( self::ID !== $id ) {
+			return $copy;
+		}
+
+		return array(
+			'button' => __( 'Validate and save', 'tagbridge' ),
+			'note'   => __( 'We check your connection before saving.', 'tagbridge' ),
+		);
 	}
 
 	/**

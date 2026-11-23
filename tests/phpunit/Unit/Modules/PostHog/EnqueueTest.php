@@ -228,11 +228,33 @@ final class EnqueueTest extends TestCase {
 		( new Enqueue() )->print_snippet();
 
 		$this->assertCount( 1, $this->printed );
-		$this->assertSame( 'tagbridge-posthog-js', $this->printed[0]['attrs']['id'] );
+		$this->assertSame( 'tagbridge-posthog-consent', $this->printed[0]['attrs']['id'] );
 		$this->assertStringContainsString( 'posthog.init("phc_test_123456"', $this->printed[0]['js'] );
 		$this->assertStringContainsString( 'posthog.identify("wp_', $this->printed[0]['js'] );
+		$this->assertStringContainsString( 'hasConsent()', $this->printed[0]['js'] );
 		$this->assertStringNotContainsString( '"persistence":"memory"', $this->printed[0]['js'] );
 		$this->assertStringContainsString( '"capture_heatmaps":true', $this->printed[0]['js'] );
+	}
+
+	public function test_cookieless_until_consent_stays_cache_safe_even_when_php_sees_consent() {
+		Functions\when( 'get_option' )->justReturn(
+			$this->configured_options(
+				array(
+					'excluded_roles' => array(),
+					'consent_mode'   => Policy::CONSENT_COOKIELESS,
+					'respect_dnt'    => false,
+				)
+			)
+		);
+		Functions\when( 'is_user_logged_in' )->justReturn( false );
+		Functions\when( 'wp_has_consent' )->justReturn( true );
+
+		( new Enqueue() )->print_snippet();
+
+		$this->assertCount( 1, $this->printed );
+		$this->assertSame( 'tagbridge-posthog-js', $this->printed[0]['attrs']['id'] );
+		$this->assertStringContainsString( '"persistence":"memory"', $this->printed[0]['js'] );
+		$this->assertStringContainsString( 'hasCookie()', $this->printed[0]['js'] );
 	}
 
 	public function test_logout_cookie_triggers_posthog_reset_when_logged_out() {

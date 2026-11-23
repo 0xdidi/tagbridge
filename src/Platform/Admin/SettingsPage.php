@@ -717,13 +717,37 @@ final class SettingsPage {
 					<?php $module->render_settings(); ?>
 				</div>
 
+				<?php
+				$save_copy = (array) apply_filters(
+					'tagbridge_module_save_copy',
+					array(
+						'button' => __( 'Save settings', 'tagbridge' ),
+						'note'   => '',
+					),
+					$id,
+					$module
+				);
+				$btn_label = ! empty( $save_copy['button'] ) ? (string) $save_copy['button'] : __( 'Save settings', 'tagbridge' );
+				$btn_note  = isset( $save_copy['note'] ) ? (string) $save_copy['note'] : '';
+				?>
 				<div class="tagbridge-actionbar tagbridge-actionbar--inset">
 					<button type="submit" class="button button-primary button-hero tagbridge-btn">
-						<?php esc_html_e( 'Validate and save', 'tagbridge' ); ?>
+						<?php echo esc_html( $btn_label ); ?>
 					</button>
-					<span class="tagbridge-actionbar__note"><?php esc_html_e( 'We check your connection before saving.', 'tagbridge' ); ?></span>
+					<?php if ( '' !== $btn_note ) : ?>
+						<span class="tagbridge-actionbar__note"><?php echo esc_html( $btn_note ); ?></span>
+					<?php endif; ?>
 				</div>
 			</form>
+			<?php
+			/**
+			 * Fires immediately after a module's main settings form closes.
+			 *
+			 * @param string             $id     Module id.
+			 * @param ConfigurableModule $module Module instance.
+			 */
+			do_action( 'tagbridge_after_module_form', $id, $module );
+			?>
 		</section>
 		<?php
 	}

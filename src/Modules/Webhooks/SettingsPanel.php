@@ -138,15 +138,23 @@ final class SettingsPanel {
 					<p class="tagbridge-help">
 						<?php esc_html_e( 'Send a sample tagbridge_test_webhook payload to verify your endpoint and signature.', 'tagbridge' ); ?>
 					</p>
-					<?php wp_nonce_field( Module::NONCE_TEST, 'tagbridge_test_webhook_nonce' ); ?>
 					<button
 						type="submit"
 						class="button button-secondary tagbridge-btn-secondary"
-						formaction="<?php echo esc_url( admin_url( 'admin-post.php?action=' . Module::ACTION_TEST ) ); ?>"
+						form="tagbridge-webhooks-test-form"
+						formnovalidate
 						<?php disabled( ! ( $configured && $enabled ) ); ?>
 					>
 						<?php esc_html_e( 'Send test webhook', 'tagbridge' ); ?>
 					</button>
+					<?php
+					add_action(
+						'tagbridge_after_module_form',
+						array( $this, 'render_test_form' ),
+						10,
+						1
+					);
+					?>
 					<?php if ( ! $configured || ! $enabled ) : ?>
 						<p class="tagbridge-help tagbridge-help--field">
 							<?php esc_html_e( 'Enable Webhooks and save an endpoint URL first before sending a test delivery.', 'tagbridge' ); ?>
@@ -185,6 +193,24 @@ final class SettingsPanel {
 				</div>
 			</section>
 		</div>
+		<?php
+	}
+
+	/**
+	 * Render the standalone test-webhook form outside the main settings form.
+	 *
+	 * @param string $module_id Rendered module id.
+	 * @return void
+	 */
+	public function render_test_form( $module_id ) {
+		if ( $this->id !== $module_id ) {
+			return;
+		}
+		?>
+		<form id="tagbridge-webhooks-test-form" method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" hidden>
+			<input type="hidden" name="action" value="<?php echo esc_attr( Module::ACTION_TEST ); ?>" />
+			<?php wp_nonce_field( Module::NONCE_TEST, 'tagbridge_test_webhook_nonce' ); ?>
+		</form>
 		<?php
 	}
 

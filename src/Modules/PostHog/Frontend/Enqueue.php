@@ -95,34 +95,37 @@ final class Enqueue {
 			return;
 		}
 
-		$decision = PrivacyGate::decision( ConsentCategory::STATISTICS );
-		if ( in_array( $decision['reason'], array( 'role_excluded', 'dnt' ), true ) ) {
+		if ( PrivacyGate::is_user_excluded() || PrivacyGate::is_dnt_blocked() ) {
 			return;
 		}
 
 		$key          = Settings::project_api_key();
 		$respect_dnt  = GlobalSettings::respect_dnt();
 		$consent_mode = GlobalSettings::consent_mode();
+		$client       = Settings::client();
+		$reset        = $this->reset_call();
 
-		if ( 'consent_denied' === $decision['reason'] ) {
+		if ( Policy::CONSENT_REQUIRE === $consent_mode ) {
 			$init_js = $this->loader() . "\n" . $this->init_call( $key, $this->build_config( false ) );
-			$reset   = $this->reset_call();
 			if ( '' !== $reset ) {
 				$init_js .= "\n" . $reset;
+			}
+			if ( PrivacyGate::has_consent( ConsentCategory::STATISTICS ) ) {
+				$identify = $this->identify_call();
+				if ( '' !== $identify ) {
+					$init_js .= "\n" . $identify;
+				}
 			}
 			$stub = $this->consent_wait_stub( $init_js, $respect_dnt );
 			wp_print_inline_script_tag( $stub, array( 'id' => 'tagbridge-posthog-consent' ) );
 			return;
 		}
 
-		$forced_cookieless = ! empty( $decision['cookieless'] );
-		$client            = Settings::client();
-		$user_cookieless   = ! empty( $client['cookieless'] );
-
-		if ( Policy::CONSENT_COOKIELESS === $consent_mode && $forced_cookieless ) {
-			$config = $this->build_config( true );
-			$js     = $this->loader() . "\n" . $this->cookieless_consent_init_call( $key, $config, ! empty( $client['session_recording'] ), $user_cookieless );
-			$reset  = $this->reset_call();
+		if ( Policy::CONSENT_COOKIELESS === $consent_mode ) {
+			$user_cookieless = ! empty( $client['cookieless'] );
+			$config          = $this->build_config( true );
+			$identify        = PrivacyGate::has_consent( ConsentCategory::STATISTICS ) ? $this->identify_call() : '';
+			$js              = $this->loader() . "\n" . $this->cookieless_consent_init_call( $key, $config, ! empty( $client['session_recording'] ), $user_cookieless, $identify );
 			if ( '' !== $reset ) {
 				$js .= "\n" . $reset;
 			}
@@ -133,25 +136,18 @@ final class Enqueue {
 			return;
 		}
 
-		$js    = $this->loader() . "\n" . $this->init_call( $key, $this->build_config( $forced_cookieless ) );
-		$reset = $this->reset_call();
+		$js = $this->loader() . "\n" . $this->init_call( $key, $this->build_config( false ) );
 		if ( '' !== $reset ) {
 			$js .= "\n" . $reset;
 		}
 
-		if ( ! $forced_cookieless ) {
-			$identify = $this->identify_call();
-			if ( '' !== $identify ) {
-				$js .= "\n" . $identify;
-			}
+		$identify = $this->identify_call();
+		if ( '' !== $identify ) {
+			$js .= "\n" . $identify;
 		}
 
 		if ( $respect_dnt ) {
 			$js = $this->wrap_dnt_guard( $js );
-		}
-
-		if ( Policy::CONSENT_OFF !== $consent_mode ) {
-			$js .= "\n" . $this->consent_change_listener( false );
 		}
 
 		wp_print_inline_script_tag( $js, array( 'id' => 'tagbridge-posthog-js' ) );
@@ -196,9 +192,10 @@ final class Enqueue {
 	 * @param array<string,mixed> $config          Initial memory-mode config.
 	 * @param bool                $replay_enabled  Whether session recording is enabled in settings.
 	 * @param bool                $user_cookieless Whether cookieless mode is explicitly forced in settings.
+	 * @param string              $identify_js     Optional posthog.identify(...) call for consented logged-in users.
 	 * @return string
 	 */
-	private function cookieless_consent_init_call( $key, array $config, $replay_enabled, $user_cookieless ) {
+	private function cookieless_consent_init_call( $key, array $config, $replay_enabled, $user_cookieless, $identify_js = '' ) {
 		if ( $replay_enabled ) {
 			$config['disable_session_recording'] = true;
 		}
@@ -210,13 +207,15 @@ final class Enqueue {
 			'replay'      => $replay_enabled,
 		);
 
+		$identify_block = '' !== $identify_js ? 'if(on){' . $identify_js . '}' : '';
+
 		$js = <<<'JS'
 (function(k,c,o){
 function hasCookie(){var m=document.cookie.match(new RegExp('(?:^|; )'+o.cookie+'=([^;]*)'));return !!m&&decodeURIComponent(m[1])==='allow';}
 function hasConsent(){return typeof window.wp_has_consent==='function'?!!window.wp_has_consent(o.category):hasCookie();}
 var on=hasCookie();
 if(on){c.persistence=o.persistence;if(o.replay){c.disable_session_recording=false;}}
-posthog.init(k,c);
+posthog.init(k,c);%s
 function apply(v){if(v===on){return;}on=v;
 if(v){if(window.posthog&&window.posthog.set_config){window.posthog.set_config({persistence:o.persistence});}if(o.replay&&window.posthog&&window.posthog.startSessionRecording){window.posthog.startSessionRecording();}if(window.posthog&&window.posthog.opt_in_capturing){window.posthog.opt_in_capturing();}}
 else{if(window.posthog&&window.posthog.stopSessionRecording){window.posthog.stopSessionRecording();}if(window.posthog&&window.posthog.set_config){window.posthog.set_config({persistence:'memory'});}}}
@@ -226,25 +225,7 @@ if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded'
 })(%s,%s,%s);
 JS;
 
-		return sprintf( $js, wp_json_encode( $key ), wp_json_encode( $config ), wp_json_encode( $options ) );
-	}
-
-	/**
-	 * Listen for live consent changes after PostHog has initialized.
-	 *
-	 * @param bool $upgrade_persistence Whether to switch from memory to standard persistence on allow.
-	 * @return string
-	 */
-	private function consent_change_listener( $upgrade_persistence ) {
-		$allow_js = $upgrade_persistence
-			? 'if(window.posthog){if(window.posthog.set_config){window.posthog.set_config({persistence:"localStorage+cookie"});}if(window.posthog.opt_in_capturing){window.posthog.opt_in_capturing();}}'
-			: 'if(window.posthog&&window.posthog.opt_in_capturing){window.posthog.opt_in_capturing();}';
-
-		return 'document.addEventListener("wp_listen_for_consent_change",function(e){'
-			. 'if(!e.detail||typeof e.detail.statistics==="undefined"){return;}'
-			. 'if(e.detail.statistics==="deny"){if(window.posthog&&window.posthog.opt_out_capturing){window.posthog.opt_out_capturing();}}'
-			. 'else if(e.detail.statistics==="allow"){' . $allow_js . '}'
-			. '});';
+		return sprintf( $js, $identify_block, wp_json_encode( $key ), wp_json_encode( $config ), wp_json_encode( $options ) );
 	}
 
 	/**

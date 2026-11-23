@@ -4,7 +4,7 @@ Tags: analytics, posthog, tracking, events, statistics
 Requires at least: 5.8
 Tested up to: 7.0
 Requires PHP: 8.2
-Stable tag: 0.4.0
+Stable tag: 0.4.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -102,6 +102,12 @@ Global controls under **Privacy & Settings** apply across all integrations:
 
 == Changelog ==
 
+= 0.4.1 =
+* Fixed "Send test webhook" and "Send test event" buttons so they submit standalone forms to their diagnostic handlers instead of triggering settings save.
+* Made PostHog browser consent bootstrapping unconditionally cache-safe in both "Require consent" and "Cookieless until consent" modes.
+* Fixed Webhooks endpoint URL validation so invalid URL schemes (such as `ftp://`) return an error instead of silently clearing the field.
+* Preserved case sensitivity in PostHog feature flag keys (`Evaluator::sanitize_flag_key()`), added script translations for the Feature Flag block, updated per-module save button copy, and refreshed `languages/tagbridge.pot`.
+
 = 0.4.0 =
 * Webhooks integration: send normalized JSON payloads with optional HMAC-SHA256 signing (`X-Tagbridge-Signature`), per-event toggles, delivery status, and a Send test webhook button.
 * PostHog Diagnostics & Feature Flags: added Diagnostics tab with live `tagbridge_test_event` check and CSP/duplicate-snippet guidance, plus server-evaluated `tagbridge/feature-flag` Gutenberg block and `[tagbridge_flag]` shortcode.
@@ -130,6 +136,9 @@ Global controls under **Privacy & Settings** apply across all integrations:
 * First release: connect to PostHog (US, EU, or self-hosted / reverse proxy), validate the key before saving, and load PostHog on the front end with tracking toggles (pageviews, autocapture, session recording, person profiles, cookieless mode).
 
 == Upgrade Notice ==
+
+= 0.4.1 =
+Fixes test webhook/event form submission, makes browser consent gating unconditionally cache-safe, fixes invalid webhook URL validation, preserves feature flag key case, and refreshes translation strings.
 
 = 0.4.0 =
 Adds the Webhooks integration, PostHog Diagnostics and server-evaluated Feature Flag block/shortcode, cache-safe consent checks, server-side person profile and session replay conformance, and enriched WooCommerce order tracking.
